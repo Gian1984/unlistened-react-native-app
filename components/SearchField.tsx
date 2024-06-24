@@ -6,7 +6,7 @@ type SearchProps = {
     onSearch: (query: string) => void;
 };
 
-const Search: React.FC<SearchProps> = ({ onSearch }) => {
+const SearchField: React.FC<SearchProps> = ({ onSearch }) => {
     const [query, setQuery] = useState('');
 
     const handleSearch = () => {
@@ -18,7 +18,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             <Ionicons name="search" size={24} color="gray" />
             <TextInput
                 style={styles.input}
-                placeholder="Search podcasts"
+                placeholder="SearchField podcasts"
                 value={query}
                 onChangeText={setQuery}
                 onSubmitEditing={handleSearch}
@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Search;
+export default SearchField;
