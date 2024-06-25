@@ -1,132 +1,189 @@
-import React, { useState } from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, View, Image, Platform } from 'react-native';
-
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import React, { useState, useEffect } from 'react';
+import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View } from 'react-native';
+import { ArrowRightIcon } from "react-native-heroicons/solid";
+import { StarIcon } from "react-native-heroicons/outline";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Logo from '@/components/Logo';
+import SearchField from "@/components/SearchField";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import SearchField from "@/components/SearchField";
-import Userstatus from "@/components/UserStatus";
+import { fetchPodcasts, searchPodcasts } from '@/api';
+import { Podcast } from '@/types';
 
-export default function SearchScreen() {
+export default function PodcastsScreen() {
+    const [podcasts, setPodcasts] = useState<Podcast[]>([]);
+    const [visibleCount, setVisibleCount] = useState(5);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-    const handleLogin = () => {
-        // Perform login logic
-        setIsLoggedIn(true);
+    const fetchData = () => {
+        fetchPodcasts()
+            .then(data => setPodcasts(data))
+            .catch(error => {
+                console.error('Error fetching podcasts:', error);
+                setError('Failed to load podcasts. Please try again later.');
+            })
+            .finally(() => setLoading(false));
     };
 
-    const handleLogout = () => {
-        // Perform logout logic
-        setIsLoggedIn(false);
+    const loadMore = () => {
+        const increment = 5;
+        setVisibleCount(Math.min(visibleCount + increment, podcasts.length));
     };
 
-    const handleRegister = () => {
-        // Perform register logic
+    const stripHtmlTags = (str: string): string => {
+        if (!str) return '';
+        return str.replace(/<[^>]*>/g, '');
     };
 
-    const handleSearch = (query: string) => {
-        // Perform search logic
+    const getReadableDate = (unixTimestamp: number): string => {
+        const date = new Date(unixTimestamp * 1000);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
     };
 
+    const handleSearch = async (query: string) => {
+        setLoading(true);
+        try {
+            const data = await searchPodcasts(query);
+            setPodcasts(data);
+        } catch (error) {
+            console.error('Error searching podcasts:', error);
+            setError('Failed to search podcasts. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-            headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
+        <SafeAreaView style={styles.safeArea}>
             <SearchField onSearch={handleSearch} />
-            <Userstatus
-                isLoggedIn={isLoggedIn}
-                onLogin={handleLogin}
-                onLogout={handleLogout}
-                onRegister={handleRegister}
-            />
-            <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Explore</ThemedText>
-            </ThemedView>
-            <ThemedText>This app includes example code to help you get started.</ThemedText>
-            <Collapsible title="File-based routing">
-                <ThemedText>
-                    This app has two screens:{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-                </ThemedText>
-                <ThemedText>
-                    The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-                    sets up the tab navigator.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/router/introduction">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Android, iOS, and web support">
-                <ThemedText>
-                    You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-                    <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-                </ThemedText>
-            </Collapsible>
-            <Collapsible title="Images">
-                <ThemedText>
-                    For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-                    different screen densities
-                </ThemedText>
-                <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-                <ExternalLink href="https://reactnative.dev/docs/images">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Custom fonts">
-                <ThemedText>
-                    Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-                    <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-                        custom fonts such as this one.
+            {loading ? (
+                <ThemedView className="flex-1 justify-center items-center">
+                    <Logo />
+                    <ThemedText className="mt-4 text-3xl font-bold text-gray-900">Hang tight!</ThemedText>
+                    <ThemedText className="mt-2 text-base text-gray-900 text-center">
+                        We're getting the latest updates to bring you the freshest podcast
                     </ThemedText>
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Light and dark mode components">
-                <ThemedText>
-                    This template has light and dark mode support. The{' '}
-                    <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-                    what the user's current color scheme is, and so you can adjust UI colors accordingly.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Animations">
-                <ThemedText>
-                    This template includes an example of an animated component. The{' '}
-                    <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-                    the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-                    to create a waving hand animation.
-                </ThemedText>
-                {Platform.select({
-                    ios: (
-                        <ThemedText>
-                            The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-                            component provides a parallax effect for the header image.
-                        </ThemedText>
-                    ),
-                })}
-            </Collapsible>
-        </ParallaxScrollView>
+                </ThemedView>
+            ) : (
+                <FlatList
+                    data={podcasts.slice(0, visibleCount)}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.flatListContent}
+                    ListHeaderComponent={() => (
+                        <View>
+                            <ThemedView className="pt-12 pb-6">
+                                <Logo />
+                                <ThemedText className="mt-3 text-base font-semibold text-indigo-600">Welcome!</ThemedText>
+                                <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Dive into the podcast world!</ThemedText>
+                            </ThemedView>
+                        </View>
+                    )}
+                    renderItem={({ item }) => (
+                        <ThemedView className="pb-6">
+                            <ThemedView className="aspect-square w-full mb-4">
+                                <Image
+                                    source={{ uri: item.image }}
+                                    className="aspect-square w-full rounded-2xl bg-gray-50"
+                                />
+                            </ThemedView>
+                            <ThemedView className="flex">
+                                <Text className="text-xs text-gray-500">
+                                    {getReadableDate(item.newestItemPublishTime)}
+                                </Text>
+                                <Text className="mt-3 text-lg font-bold text-gray-900">
+                                    {item.title}
+                                </Text>
+                                <Text className="mt-5 text-sm text-gray-600">
+                                    {stripHtmlTags(item.description)}
+                                </Text>
+                                <Text className="mt-5 font-semibold text-gray-900">
+                                    Categories:
+                                </Text>
+                                <View>
+                                    {item.categories && typeof item.categories === 'object' && Object.keys(item.categories).length > 0 ? (
+                                        Object.entries(item.categories).map(([key, value]) => (
+                                            <Text key={key} className="text-gray-600">
+                                                {value}
+                                            </Text>
+                                        ))
+                                    ) : (
+                                        <Text className="text-gray-600">No categories available</Text>
+                                    )}
+                                </View>
+                                <ThemedView className="flex border-b py-6">
+                                    <ThemedView className="flex-row items-center gap-4">
+                                        <Image
+                                            source={{ uri: item.artwork }}
+                                            className="h-10 w-10 rounded-full bg-gray-50"
+                                        />
+                                        <ThemedView className="text-sm">
+                                            <ThemedText className="text-gray-600">Author:</ThemedText>
+                                            <Text className="font-semibold text-gray-900">
+                                                {item.author}
+                                            </Text>
+                                        </ThemedView>
+                                        <ThemedView className="flex-row">
+                                            <TouchableOpacity
+                                                className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                            >
+                                                <StarIcon className="h-5 w-5" color="white" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                            >
+                                                <ArrowRightIcon className="h-5 w-5" color="white" />
+                                            </TouchableOpacity>
+                                        </ThemedView>
+                                    </ThemedView>
+                                </ThemedView>
+                            </ThemedView>
+                        </ThemedView>
+                    )}
+                    ListFooterComponent={() =>
+                        visibleCount < podcasts.length ? (
+                            <TouchableOpacity
+                                className="bg-indigo-700 py-4 px-4 mx-1 rounded-full flex"
+                                onPress={loadMore}
+                            >
+                                <Text className="text-white text-center font-bold">Load More...</Text>
+                            </TouchableOpacity>
+                        ) : null
+                    }
+                />
+            )}
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff', // Ensure the status bar area has a white background
+    },
     headerImage: {
         color: '#808080',
         bottom: -90,
         left: -35,
         position: 'absolute',
+    },
+    flatListContent: {
+        paddingVertical: 8,
+        paddingHorizontal: 30,
+    },
+    itemContainer: {
+        gap: 20,
+        marginBottom: 8,
     },
     titleContainer: {
         flexDirection: 'row',

@@ -4,9 +4,10 @@ import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Logo from '@/components/Logo';
+import SearchField from "@/components/SearchField";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { fetchPodcasts } from '@/api';
+import { fetchPodcasts, searchPodcasts } from '@/api';
 import { Podcast } from '@/types';
 
 
@@ -54,7 +55,18 @@ export default function PodcastsScreen() {
         });
     };
 
-
+    const handleSearch = async (query: string) => {
+        setLoading(true);
+        try {
+            const data = await searchPodcasts(query);
+            setPodcasts(data);
+        } catch (error) {
+            console.error('Error searching podcasts:', error);
+            setError('Failed to search podcasts. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -62,7 +74,7 @@ export default function PodcastsScreen() {
                 <ThemedView className="flex-1 justify-center items-center">
                     <Logo />
                     <ThemedText className="mt-4 text-3xl font-bold text-gray-900">Hang tight!</ThemedText>
-                    <ThemedText className="mt-2 text-base text-gray-900">
+                    <ThemedText className="mt-2 text-base text-gray-900 text-center">
                         We're getting the latest updates to bring you the freshest podcast
                     </ThemedText>
                 </ThemedView>
@@ -73,10 +85,13 @@ export default function PodcastsScreen() {
                     contentContainerStyle={styles.flatListContent}
                     ListHeaderComponent={() => (
                         <View>
-                            <ThemedView className="py-12">
+                            <ThemedView className="pt-12 pb-6">
                                 <Logo />
                                 <ThemedText className="mt-3 text-base font-semibold text-indigo-600">Welcome!</ThemedText>
                                 <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Dive into the podcast world!</ThemedText>
+                            </ThemedView>
+                            <ThemedView className="pt-6 pb-12">
+                                <SearchField onSearch={handleSearch} />
                             </ThemedView>
                         </View>
                     )}

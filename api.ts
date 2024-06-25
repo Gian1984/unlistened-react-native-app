@@ -17,3 +17,14 @@ export const fetchPodcasts = async (): Promise<Podcast[]> => {
     }
 };
 
+
+export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
+    try {
+        const response = await api.get<{ feeds: Podcast[] }>(`api/search-feed-by-title/${title}`);
+        return response.data.feeds;
+    } catch (error) {
+        console.error('Error searching podcasts:', error);
+        throw error;
+    }
+};
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 type SearchProps = {
@@ -15,10 +15,12 @@ const SearchField: React.FC<SearchProps> = ({ onSearch }) => {
 
     return (
         <View style={styles.searchContainer}>
-            <Ionicons name="search" size={24} color="gray" />
+            <TouchableOpacity onPress={handleSearch}>
+                <Ionicons name="search" size={24} color="gray" />
+            </TouchableOpacity>
             <TextInput
                 style={styles.input}
-                placeholder="SearchField podcasts"
+                placeholder="Search podcasts"
                 value={query}
                 onChangeText={setQuery}
                 onSubmitEditing={handleSearch}
@@ -45,3 +47,4 @@ const styles = StyleSheet.create({
 });
 
 export default SearchField;
+
