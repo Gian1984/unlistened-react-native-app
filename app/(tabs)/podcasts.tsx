@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Text, TouchableOpacity, FlatList, ActivityIndicator, Button, StyleSheet, View } from 'react-native';
+import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View } from 'react-native';
 import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,30 +8,41 @@ import SearchField from "@/components/SearchField";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { fetchPodcasts, searchPodcasts } from '@/api';
-import { Podcast } from '@/types';
+import { Podcast, RootStackParamList } from '@/types';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
 
 
 export default function PodcastsScreen() {
-
     const [podcasts, setPodcasts] = useState<Podcast[]>([]);
     const [visibleCount, setVisibleCount] = useState(5);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-
+    const [searchPerformed, setSearchPerformed] = useState(false);
+    const navigation = useNavigation<NavigationProp>();
 
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = () => {
+        setLoading(true);
         fetchPodcasts()
-            .then(data => setPodcasts(data))
+            .then(data => {
+                setPodcasts(data);
+                setError(null);
+            })
             .catch(error => {
                 console.error('Error fetching podcasts:', error);
                 setError('Failed to load podcasts. Please try again later.');
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                setSearchPerformed(false);
+            });
     };
 
     const loadMore = () => {
@@ -55,17 +66,29 @@ export default function PodcastsScreen() {
         });
     };
 
-    const handleSearch = async (query: string) => {
+    const handleSearch = (query: string) => {
         setLoading(true);
-        try {
-            const data = await searchPodcasts(query);
-            setPodcasts(data);
-        } catch (error) {
-            console.error('Error searching podcasts:', error);
-            setError('Failed to search podcasts. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
+        setSearchPerformed(true);
+        searchPodcasts(query)
+            .then(data => {
+                setPodcasts(data);
+                setError(null);
+            })
+            .catch(error => {
+                console.error('Error searching podcasts:', error);
+                setError('Failed to search podcasts. Please try again later.');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+
+    const handleBackToAll = () => {
+        fetchData();
+    };
+
+    const navigateToEpisodes = (podcastId: number) => {
+        navigation.navigate('Episodes', { podcastId });
     };
 
     return (
@@ -92,6 +115,11 @@ export default function PodcastsScreen() {
                             </ThemedView>
                             <ThemedView className="pt-6 pb-12">
                                 <SearchField onSearch={handleSearch} />
+                                {searchPerformed && (
+                                    <TouchableOpacity className="bg-indigo-700 py-4 px-4 mx-1 rounded-full flex"  onPress={handleBackToAll}>
+                                        <Text className="text-white text-center font-bold" >Back to All Podcasts</Text>
+                                    </TouchableOpacity>
+                                )}
                             </ThemedView>
                         </View>
                     )}
@@ -147,6 +175,7 @@ export default function PodcastsScreen() {
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                                onPress={() => navigateToEpisodes(item.id)}
                                             >
                                                 <ArrowRightIcon className="h-5 w-5" color="white" />
                                             </TouchableOpacity>
