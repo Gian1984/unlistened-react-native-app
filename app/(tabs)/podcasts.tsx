@@ -18,21 +18,20 @@ export default function PodcastsScreen() {
     const [error, setError] = useState<string | null>(null);
 
 
+
     useEffect(() => {
-        const getPodcasts = async () => {
-            try {
-                const data = await fetchPodcasts();
-                setPodcasts(data);
-            } catch (error) {
+        fetchData();
+    }, []);
+
+    const fetchData = () => {
+        fetchPodcasts()
+            .then(data => setPodcasts(data))
+            .catch(error => {
                 console.error('Error fetching podcasts:', error);
                 setError('Failed to load podcasts. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getPodcasts();
-    }, []);
+            })
+            .finally(() => setLoading(false));
+    };
 
     const loadMore = () => {
         const increment = 5;

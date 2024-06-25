@@ -1,35 +1,12 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-
-interface Post {
-    id: number;
-    title: string;
-    body: string;
-}
-
 export default function HomeScreen() {
-
-    const [data, setData] = useState<Post[]>([]);
-
-    useEffect(() => {
-        // Fetch data from fake API
-        axios.get('https://jsonplaceholder.typicode.com/posts')
-            .then(response => {
-                setData(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
-
 
   return (
       <SafeAreaView style={styles.safeArea}>
@@ -107,15 +84,7 @@ export default function HomeScreen() {
                         Join me at Unlistened.me to explore, learn, and grow through the vast world of podcasts, completely free and with total privacy.
                     </ThemedText>
                 </ThemedView>
-                <ThemedView style={styles.stepContainer}>
-                    <ThemedText className="text-xl font-bold text-indigo-600 mb-4">Fetched Data:</ThemedText>
-                    {data.map(item => (
-                        <ThemedView key={item.id} className="mb-4">
-                            <ThemedText className="text-lg font-semibold text-gray-900">{item.title}</ThemedText>
-                            <ThemedText className="text-base text-gray-700">{item.body}</ThemedText>
-                        </ThemedView>
-                    ))}
-                </ThemedView>
+
             </ParallaxScrollView>
       </SafeAreaView>
 
