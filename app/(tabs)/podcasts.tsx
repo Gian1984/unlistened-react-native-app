@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image, Text, TouchableOpacity, FlatList, ActivityIndicator, Button, StyleSheet, View } from 'react-native';
 import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
@@ -6,77 +6,37 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Logo from '@/components/Logo';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { fetchPodcasts } from '@/api';
+import { Podcast } from '@/types';
 
-const fakePodcasts = [
-    {
-        id: 1,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 1',
-        description: 'This is a description for the first sample podcast episode.',
-        categories: ['Technology', 'Education'],
-        author: 'John Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    },
-    {
-        id: 2,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 2',
-        description: 'This is a description for the second sample podcast episode.',
-        categories: ['Business', 'Entrepreneurship'],
-        author: 'Jane Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    },
-    {
-        id: 3,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 2',
-        description: 'This is a description for the second sample podcast episode.',
-        categories: ['Business', 'Entrepreneurship'],
-        author: 'Jane Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    },
-    {
-        id: 4,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 2',
-        description: 'This is a description for the second sample podcast episode.',
-        categories: ['Business', 'Entrepreneurship'],
-        author: 'Jane Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    },
-    {
-        id: 5,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 2',
-        description: 'This is a description for the second sample podcast episode.',
-        categories: ['Business', 'Entrepreneurship'],
-        author: 'Jane Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    },
-    {
-        id: 6,
-        image: 'https://via.placeholder.com/150',
-        title: 'Sample Podcast Episode 2',
-        description: 'This is a description for the second sample podcast episode.',
-        categories: ['Business', 'Entrepreneurship'],
-        author: 'Jane Doe',
-        newestItemPublishTime: 1627889180,
-        artwork: 'https://via.placeholder.com/50'
-    }
-];
 
 export default function PodcastsScreen() {
+
+    const [podcasts, setPodcasts] = useState<Podcast[]>([]);
     const [visibleCount, setVisibleCount] = useState(5);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const getPodcasts = async () => {
+            try {
+                const data = await fetchPodcasts();
+                setPodcasts(data);
+            } catch (error) {
+                console.error('Error fetching podcasts:', error);
+                setError('Failed to load podcasts. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getPodcasts();
+    }, []);
 
     const loadMore = () => {
         const increment = 5;
-        setVisibleCount(Math.min(visibleCount + increment, fakePodcasts.length));
+        setVisibleCount(Math.min(visibleCount + increment, podcasts.length));
     };
 
     const stripHtmlTags = (str: string): string => {
@@ -109,7 +69,7 @@ export default function PodcastsScreen() {
                 </ThemedView>
             ) : (
                 <FlatList
-                    data={fakePodcasts.slice(0, visibleCount)}
+                    data={podcasts.slice(0, visibleCount)}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.flatListContent}
                     ListHeaderComponent={() => (
@@ -142,11 +102,17 @@ export default function PodcastsScreen() {
                                 <Text className="mt-5 font-semibold text-gray-900">
                                     Categories:
                                 </Text>
-                                {item.categories.map((category, index) => (
-                                    <Text key={index} className="text-gray-600">
-                                        {category}
-                                    </Text>
-                                ))}
+                                <View>
+                                    {item.categories && typeof item.categories === 'object' && Object.keys(item.categories).length > 0 ? (
+                                        Object.entries(item.categories).map(([key, value]) => (
+                                            <Text key={key} className="text-gray-600">
+                                                {value}
+                                            </Text>
+                                        ))
+                                    ) : (
+                                        <Text className="text-gray-600">No categories available</Text>
+                                    )}
+                                </View>
                                 <ThemedView className="flex border-b py-6">
                                     <ThemedView className="flex-row items-center gap-4">
                                         <Image
@@ -177,7 +143,7 @@ export default function PodcastsScreen() {
                         </ThemedView>
                     )}
                     ListFooterComponent={() =>
-                        visibleCount < fakePodcasts.length ? (
+                        visibleCount < podcasts.length ? (
                             <TouchableOpacity
                                 className="bg-indigo-700 py-4 px-4 mx-1 rounded-full flex"
                                 onPress={loadMore}
