@@ -25,6 +25,14 @@ export interface FeedInfo {
     datePublishedPretty: string;
 }
 
+export type FeedInfoResponse = {
+    feed: FeedInfo;
+};
+
+export type EpisodesResponse = {
+    items: Episode[];
+};
+
 export type RootStackParamList = {
     Home: undefined;
     Podcasts: undefined;

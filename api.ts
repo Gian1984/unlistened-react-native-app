@@ -1,6 +1,8 @@
 // api.ts
 import axios from 'axios';
-import { Podcast, Episode, FeedInfo } from './types';
+import { Podcast, Episode, FeedInfo, FeedInfoResponse, EpisodesResponse } from './types';
+
+axios.defaults.withCredentials = true;
 
 const api = axios.create({
     baseURL: 'http://localhost/', // Replace with your API base URL
@@ -27,15 +29,36 @@ export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
     }
 };
 
-export const fetchFeedInfo = async (podcastId: number): Promise<FeedInfo> => {
-    const response = await api.get<FeedInfo>(`api/feed_info/${podcastId}`); // Replace with your feed info endpoint
-    return response.data;
+export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
+    try {
+        const response = await axios.get<FeedInfoResponse>(`api/feed_info/${feedId}`);
+        return response.data.feed;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Error fetching episodes:', error.response?.data || error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+        throw error;
+    }
 };
 
-export const fetchEpisodes = async (podcastId: number): Promise<Episode[]> => {
-    const response = await api.get<Episode[]>(`api/search_feed/${podcastId}`); // Replace with your episodes endpoint
-    return response.data;
+
+export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
+    try {
+        const response = await axios.get<EpisodesResponse>(`api/search_feed/${feedId}`);
+        return response.data.items;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Error fetching episodes:', error.response?.data || error.message);
+            throw new Error(error.response?.data.message || error.message);
+        } else {
+            console.error('Unexpected error:', error);
+            throw new Error('Unexpected error occurred');
+        }
+    }
 };
+
 
 export const addFavourite = async (feedId: number, feedTitle: string): Promise<void> => {
     await api.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
@@ -48,5 +71,9 @@ export const addBookmark = async (episodeId: number, episodeTitle: string): Prom
 export const downloadPodcast = async (title: string, url: string, id: number): Promise<void> => {
     // Your download logic here
     // You may need to use different logic to handle file downloads in React Native
+};
+
+export const playEpisode = (episode: any) => {
+    // Your play logic here
 };
 
