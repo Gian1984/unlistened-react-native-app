@@ -1,3 +1,4 @@
+// app/(tabs)/podcasts.tsx
 import React, { useState, useEffect } from 'react';
 import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View } from 'react-native';
 import { ArrowRightIcon } from "react-native-heroicons/solid";
@@ -12,9 +13,7 @@ import { Podcast, RootStackParamList } from '@/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
-
 
 export default function PodcastsScreen() {
     const [podcasts, setPodcasts] = useState<Podcast[]>([]);
@@ -87,8 +86,8 @@ export default function PodcastsScreen() {
         fetchData();
     };
 
-    const navigateToEpisodes = (podcastId: number) => {
-        navigation.navigate('Episodes', { podcastId });
+    const navigateToEpisodes = (id: number) => {
+        navigation.navigate('Episodes', { id });
     };
 
     return (

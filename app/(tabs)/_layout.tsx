@@ -1,11 +1,16 @@
-// _layout.tsx
-
+// app/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Text } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { createStackNavigator } from '@react-navigation/stack';
+import EpisodesScreen from "@/app/screens/episodes";
+import AboutScreen from "@/app/screens/about";
+import { RootStackParamList } from '@/types';
+
+
 
 type IconName =
     | 'home'
@@ -27,7 +32,10 @@ const iconNames: Record<string, { focused: IconName; unfocused: IconName }> = {
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
 };
 
-export default function TabLayout() {
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+function MainTabs() {
     const colorScheme = useColorScheme();
 
     return (
@@ -52,9 +60,9 @@ export default function TabLayout() {
                         </Text>
                     ),
                     tabBarStyle: {
-                        borderTopWidth: 0, // Remove the border
-                        elevation: 0, // Remove shadow on Android
-                        shadowOpacity: 0, // Remove shadow on iOS
+                        borderTopWidth: 0,
+                        elevation: 0,
+                        shadowOpacity: 0,
                     },
                 };
             }}
@@ -80,6 +88,28 @@ export default function TabLayout() {
                 options={{ title: 'Bookmarks' }}
             />
         </Tabs>
+    );
+}
+
+export default function App() {
+    return (
+
+            <Stack.Navigator>
+                <Stack.Screen
+                    name="MainTabs"
+                    component={MainTabs}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Episodes"
+                    component={EpisodesScreen}
+                />
+                <Stack.Screen
+                    name="About"
+                    component={AboutScreen}
+                />
+            </Stack.Navigator>
+
     );
 }
 

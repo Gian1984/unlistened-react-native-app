@@ -26,6 +26,12 @@ export interface FeedInfo {
 }
 
 export type RootStackParamList = {
-    Root: undefined;
-    Episodes: { podcastId: number };
+    Home: undefined;
+    Podcasts: undefined;
+    Search: undefined;
+    Favourites: undefined;
+    Bookmarks: undefined;
+    Episodes: { id: number };
+    About: undefined;
+    MainTabs: undefined;
 };
