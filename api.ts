@@ -2,16 +2,16 @@
 import axios from 'axios';
 import { Podcast, Episode, FeedInfo, FeedInfoResponse, EpisodesResponse } from './types';
 
-axios.defaults.withCredentials = true;
+const baseUrl = 'http://localhost';
 
-const api = axios.create({
-    baseURL: 'http://localhost/', // Replace with your API base URL
-    timeout: 10000,
+const apiClient = axios.create({
+    baseURL: baseUrl,
+    withCredentials: true,
 });
 
 export const fetchPodcasts = async (): Promise<Podcast[]> => {
     try {
-        const response = await api.get<{ feeds: Podcast[] }>('api/index'); // Adjust the response type
+        const response = await apiClient.get<{ feeds: Podcast[] }>('/api/index'); // Adjust the response type
         return response.data.feeds; // Adjust to match the response structure
     } catch (error) {
         console.error('Error fetching podcasts:', error);
@@ -21,7 +21,7 @@ export const fetchPodcasts = async (): Promise<Podcast[]> => {
 
 export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
     try {
-        const response = await api.get<{ feeds: Podcast[] }>(`api/search-feed-by-title/${title}`);
+        const response = await apiClient.get<{ feeds: Podcast[] }>(`/api/search-feed-by-title/${title}`);
         return response.data.feeds;
     } catch (error) {
         console.error('Error searching podcasts:', error);
@@ -31,7 +31,7 @@ export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
 
 export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
     try {
-        const response = await axios.get<FeedInfoResponse>(`api/feed_info/${feedId}`);
+        const response = await axios.get<FeedInfoResponse>(`/api/feed_info/${feedId}`);
         return response.data.feed;
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -46,26 +46,22 @@ export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
 
 export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
     try {
-        const response = await axios.get<EpisodesResponse>(`api/search_feed/${feedId}`);
+        await apiClient.get('/sanctum/csrf-cookie');
+        const response = await apiClient.get(`/api/search_feed/${feedId}`);
         return response.data.items;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.error('Error fetching episodes:', error.response?.data || error.message);
-            throw new Error(error.response?.data.message || error.message);
-        } else {
-            console.error('Unexpected error:', error);
-            throw new Error('Unexpected error occurred');
-        }
+        console.error('Error fetching episodes:', error);
+        throw error;
     }
 };
 
 
 export const addFavourite = async (feedId: number, feedTitle: string): Promise<void> => {
-    await api.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
+    await apiClient.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
 };
 
 export const addBookmark = async (episodeId: number, episodeTitle: string): Promise<void> => {
-    await api.post('api/add-bookmark', { episode_id: episodeId, title: episodeTitle });
+    await apiClient.post('api/add-bookmark', { episode_id: episodeId, title: episodeTitle });
 };
 
 export const downloadPodcast = async (title: string, url: string, id: number): Promise<void> => {
@@ -77,3 +73,4 @@ export const playEpisode = (episode: any) => {
     // Your play logic here
 };
 
+export default apiClient;

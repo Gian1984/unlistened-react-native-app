@@ -1,13 +1,10 @@
-// EpisodesScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import axios from 'axios';
-import { RootStackParamList, Episode } from '@/types';
+import { fetchEpisodes } from '@/api'; // Adjust the import path as necessary
+import { RootStackParamList, Episode } from '@/types'; // Adjust the import path as necessary
 
 type EpisodesScreenRouteProp = RouteProp<RootStackParamList, 'Episodes'>;
-
-const baseUrl = 'http://localhost';
 
 const EpisodesScreen: React.FC = () => {
     const route = useRoute<EpisodesScreenRouteProp>();
@@ -17,21 +14,16 @@ const EpisodesScreen: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchEpisodes = async () => {
-            try {
-                const response = await axios.get(`${baseUrl}/api/search_feed/${id}`);
-                setEpisodes(response.data.items);
-            } catch (error) {
+        fetchEpisodes(id)
+            .then((episodesData) => {
+                setEpisodes(episodesData);
+                setLoading(false);
+            })
+            .catch((error) => {
                 console.error('Error fetching episodes:', error);
                 setError('Error fetching episodes');
-            } finally {
                 setLoading(false);
-            }
-        };
-
-        (async () => {
-            await fetchEpisodes();
-        })();
+            });
     }, [id]);
 
     if (loading) {
@@ -68,4 +60,3 @@ const EpisodesScreen: React.FC = () => {
 };
 
 export default EpisodesScreen;
-
