@@ -1,6 +1,6 @@
 // api.ts
 import axios from 'axios';
-import { Podcast, Episode, FeedInfo, FeedInfoResponse, EpisodesResponse } from './types';
+import { Podcast, Episode, FeedInfo } from './types';
 
 const baseUrl = 'http://localhost';
 
@@ -29,16 +29,13 @@ export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
     }
 };
 
-export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
+export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> =>  {
     try {
-        const response = await axios.get<FeedInfoResponse>(`/api/feed_info/${feedId}`);
+        await apiClient.get('/sanctum/csrf-cookie');
+        const response = await apiClient.get(`/api/feed_info/${feedId}`);
         return response.data.feed;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.error('Error fetching episodes:', error.response?.data || error.message);
-        } else {
-            console.error('Unexpected error:', error);
-        }
+        console.error('Error fetching episodes:', error);
         throw error;
     }
 };

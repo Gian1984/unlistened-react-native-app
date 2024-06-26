@@ -154,31 +154,19 @@ export default function PodcastsScreen() {
                                         <Text className="text-gray-600">No categories available</Text>
                                     )}
                                 </View>
-                                <ThemedView className="flex border-b py-6">
-                                    <ThemedView className="flex-row items-center gap-4">
-                                        <Image
-                                            source={{ uri: item.artwork }}
-                                            className="h-10 w-10 rounded-full bg-gray-50"
-                                        />
-                                        <ThemedView className="text-sm">
-                                            <ThemedText className="text-gray-600">Author:</ThemedText>
-                                            <Text className="font-semibold text-gray-900">
-                                                {item.author}
-                                            </Text>
-                                        </ThemedView>
-                                        <ThemedView className="flex-row">
-                                            <TouchableOpacity
-                                                className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
-                                            >
-                                                <StarIcon className="h-5 w-5" color="white" />
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
-                                                onPress={() => navigateToEpisodes(item.id)}
-                                            >
-                                                <ArrowRightIcon className="h-5 w-5" color="white" />
-                                            </TouchableOpacity>
-                                        </ThemedView>
+                                <ThemedView className="flex border-b">
+                                    <ThemedView className="flex-row py-6">
+                                        <TouchableOpacity
+                                            className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                        >
+                                            <StarIcon className="h-5 w-5" color="white" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                            onPress={() => navigateToEpisodes(item.id)}
+                                        >
+                                            <ArrowRightIcon className="h-5 w-5" color="white" />
+                                        </TouchableOpacity>
                                     </ThemedView>
                                 </ThemedView>
                             </ThemedView>

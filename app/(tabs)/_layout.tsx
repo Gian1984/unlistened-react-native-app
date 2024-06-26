@@ -35,7 +35,7 @@ const iconNames: Record<string, { focused: IconName; unfocused: IconName }> = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-function MainTabs() {
+function Feed() {
     const colorScheme = useColorScheme();
 
     return (
@@ -96,8 +96,8 @@ export default function App() {
 
             <Stack.Navigator>
                 <Stack.Screen
-                    name="MainTabs"
-                    component={MainTabs}
+                    name="Feed"
+                    component={Feed}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

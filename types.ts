@@ -23,15 +23,11 @@ export interface FeedInfo {
     description: string;
     image: string;
     datePublishedPretty: string;
+    author:string;
+    artwork:string;
+    categories:string[];
+    newestItemPublishTime:number;
 }
-
-export type FeedInfoResponse = {
-    feed: FeedInfo;
-};
-
-export type EpisodesResponse = {
-    items: Episode[];
-};
 
 export type RootStackParamList = {
     Home: undefined;
@@ -41,5 +37,5 @@ export type RootStackParamList = {
     Bookmarks: undefined;
     Episodes: { id: number };
     About: undefined;
-    MainTabs: undefined;
+    Feed: undefined;
 };
