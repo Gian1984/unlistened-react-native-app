@@ -8,6 +8,7 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { createStackNavigator } from '@react-navigation/stack';
 import EpisodesScreen from "@/app/screens/episodes";
 import AboutScreen from "@/app/screens/about";
+import PlayerScreen from "@/app/screens/player";
 import { RootStackParamList } from '@/types';
 
 
@@ -107,6 +108,10 @@ export default function App() {
                 <Stack.Screen
                     name="About"
                     component={AboutScreen}
+                />
+                <Stack.Screen
+                    name="Player"
+                    component={PlayerScreen}
                 />
             </Stack.Navigator>
 

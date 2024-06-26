@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet} from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { fetchEpisodes, fetchFeedInfo, addFavourite, addBookmark, downloadPodcast } from '@/api'; // Ensure these functions are defined in your API
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { fetchEpisodes, fetchFeedInfo, addFavourite, addBookmark, downloadPodcast } from '@/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
-import { CheckCircleIcon, XMarkIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon, StarIcon } from 'react-native-heroicons/outline';
-import {ThemedText} from "@/components/ThemedText";
+import { CheckCircleIcon, XMarkIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type EpisodesScreenRouteProp = RouteProp<RootStackParamList, 'Episodes'>;
+type PlayerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Player'>;
 
 const EpisodesScreen: React.FC = () => {
     const route = useRoute<EpisodesScreenRouteProp>();
+    const navigation = useNavigation<PlayerScreenNavigationProp>();
     const { id } = route.params;
     const [feedInfo, setFeedInfo] = useState<FeedInfo | null>(null);
     const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -55,18 +57,16 @@ const EpisodesScreen: React.FC = () => {
 
     const handlePlayEpisode = (episode: Episode) => {
         setSelectedEpisode(episode);
-        // Implement playEpisode logic
+        navigation.navigate('Player', { episode });
     };
 
     if (loading) {
         return (
             <SafeAreaView style={styles.safeArea}>
-                <ThemedView className="flex-1 justify-center items-center">
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <ActivityIndicator size="large" color="#4F46E5" />
-                        <Text className="mt-4 text-3xl font-bold text-gray-900">Hang tight!</Text>
-                        <Text className="mt-6 text-base text-gray-900">We're getting the latest updates to bring you the freshest podcast.</Text>
-                    </View>
+                <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                    <ActivityIndicator size="large" color="#ec4899" />
+                    <Text className="mt-4 text-3xl font-bold text-gray-900">Hang tight!</Text>
+                    <Text className="mt-6 text-base text-center text-gray-900">We're getting the latest updates to bring you the freshest episodes.</Text>
                 </ThemedView>
             </SafeAreaView>
         );
@@ -75,7 +75,7 @@ const EpisodesScreen: React.FC = () => {
     if (error) {
         return (
             <SafeAreaView style={styles.safeArea}>
-                <ThemedView className="flex-1 justify-center items-center">
+                <ThemedView className="flex-1 justify-center items-center mb-32">
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ color: 'red' }}>{error}</Text>
                     </View>

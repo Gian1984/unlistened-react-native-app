@@ -15,6 +15,8 @@ export interface Episode {
     description: string;
     datePublishedPretty: string;
     enclosureUrl: string;
+    feedImage: string;
+    datePublished: number;
 }
 
 export interface FeedInfo {
@@ -36,6 +38,7 @@ export type RootStackParamList = {
     Favourites: undefined;
     Bookmarks: undefined;
     Episodes: { id: number };
+    Player: { episode: Episode };
     About: undefined;
     Feed: undefined;
 };
