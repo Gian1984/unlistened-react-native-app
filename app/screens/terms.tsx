@@ -5,7 +5,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-const AboutScreen: React.FC = () => {
+const TermsScreen: React.FC = () => {
     return (
         <ParallaxScrollView
             headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -98,4 +98,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AboutScreen;
+export default TermsScreen;

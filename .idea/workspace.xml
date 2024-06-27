@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a873fc7-52ea-4a3d-8863-afd309bb4b41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/screens/terms.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/podcasts.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/screens/about.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/screens/about.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/SearchField.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/SearchField.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +77,7 @@
       <workItem from="1718952375138" duration="499000" />
       <workItem from="1718952897641" duration="2682000" />
       <workItem from="1718988751227" duration="14309000" />
-      <workItem from="1719319934499" duration="43507000" />
+      <workItem from="1719319934499" duration="45070000" />
     </task>
     <servers />
   </component>

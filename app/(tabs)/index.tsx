@@ -122,12 +122,16 @@ export default function PodcastsScreen() {
                 ListHeaderComponent={() => (
                     <View>
                         <ThemedView className="pt-3 pb-1">
-                            <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Dive into the podcast world!</ThemedText>
+                            {searchPerformed ? (
+                                    <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Result :</ThemedText>
+                            ) : (
+                                <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Dive into the podcast world!</ThemedText>
+                            )}
                         </ThemedView>
                         <ThemedView className="pt-3 pb-12">
                             <SearchField onSearch={handleSearch} />
                             {searchPerformed && (
-                                <TouchableOpacity className="bg-indigo-700 py-4 mx-1 rounded-full flex"  onPress={handleBackToAll}>
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex"  onPress={handleBackToAll}>
                                     <Text className="text-white text-center font-bold" >Back to All Podcasts</Text>
                                 </TouchableOpacity>
                             )}

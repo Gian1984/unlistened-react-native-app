@@ -57,6 +57,7 @@ export type RootStackParamList = {
     Episodes: { id: number };
     Player: { episode: Episode };
     About: undefined;
+    Terms: undefined;
     Settings: undefined;
     Back: undefined;
 };

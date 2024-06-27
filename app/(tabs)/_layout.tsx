@@ -7,6 +7,7 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { createStackNavigator } from '@react-navigation/stack';
 import EpisodesScreen from "@/app/screens/episodes";
 import AboutScreen from "@/app/screens/about";
+import TermsScreen from "@/app/screens/terms";
 import PlayerScreen from "@/app/screens/player";
 import { RootStackParamList } from '@/types';
 import { ComponentProps } from 'react';
@@ -15,7 +16,7 @@ import SettingsScreen from "@/app/(tabs)/settings";
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     search: { focused: 'magnify', unfocused: 'magnify' },
-    favourites: { focused: 'star-cog', unfocused: 'star-cog-outline' },
+    favourites: { focused: 'star', unfocused: 'star-outline' },
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
     settings: { focused: 'cog', unfocused: 'cog-outline' },
     index:{ focused: 'microphone', unfocused: 'microphone-outline' },
@@ -104,6 +105,10 @@ export default function App() {
             <Stack.Screen
                 name="About"
                 component={AboutScreen}
+            />
+            <Stack.Screen
+                name="Terms"
+                component={TermsScreen}
             />
         </Stack.Navigator>
     );
