@@ -14,11 +14,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SettingsScreen from "@/app/(tabs)/settings";
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
-    podcasts: { focused: 'microphone', unfocused: 'microphone-outline' },
     search: { focused: 'magnify', unfocused: 'magnify' },
     favourites: { focused: 'star-cog', unfocused: 'star-cog-outline' },
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
     settings: { focused: 'cog', unfocused: 'cog-outline' },
+    index:{ focused: 'microphone', unfocused: 'microphone-outline' },
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -28,6 +28,7 @@ function Back() {
 
     return (
         <Tabs
+            initialRouteName="podcasts"
             screenOptions={({ route }) => {
                 const icons = iconNames[route.name] || { focused: 'home', unfocused: 'home-outline' };
                 return {
@@ -56,7 +57,7 @@ function Back() {
             }}
         >
             <Tabs.Screen
-                name="podcasts"
+                name="index"
                 options={{ title: 'Podcasts' }}
             />
             <Tabs.Screen
