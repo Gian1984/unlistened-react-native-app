@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Text } from 'react-native';
@@ -10,33 +9,21 @@ import EpisodesScreen from "@/app/screens/episodes";
 import AboutScreen from "@/app/screens/about";
 import PlayerScreen from "@/app/screens/player";
 import { RootStackParamList } from '@/types';
+import { ComponentProps } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import SettingsScreen from "@/app/(tabs)/settings";
 
-
-
-type IconName =
-    | 'home'
-    | 'home-outline'
-    | 'mic'
-    | 'mic-outline'
-    | 'search'
-    | 'search-outline'
-    | 'star'
-    | 'star-outline'
-    | 'bookmark'
-    | 'bookmark-outline';
-
-const iconNames: Record<string, { focused: IconName; unfocused: IconName }> = {
-    index: { focused: 'home', unfocused: 'home-outline' },
-    podcasts: { focused: 'mic', unfocused: 'mic-outline' },
-    search: { focused: 'search', unfocused: 'search-outline' },
-    favourites: { focused: 'star', unfocused: 'star-outline' },
+const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
+    podcasts: { focused: 'microphone', unfocused: 'microphone-outline' },
+    search: { focused: 'magnify', unfocused: 'magnify' },
+    favourites: { focused: 'star-cog', unfocused: 'star-cog-outline' },
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
+    settings: { focused: 'cog', unfocused: 'cog-outline' },
 };
-
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-function Feed() {
+function Back() {
     const colorScheme = useColorScheme();
 
     return (
@@ -69,10 +56,6 @@ function Feed() {
             }}
         >
             <Tabs.Screen
-                name="index"
-                options={{ title: 'Home' }}
-            />
-            <Tabs.Screen
                 name="podcasts"
                 options={{ title: 'Podcasts' }}
             />
@@ -88,35 +71,44 @@ function Feed() {
                 name="bookmarks"
                 options={{ title: 'Bookmarks' }}
             />
+            <Tabs.Screen
+                name="settings"
+                options={{ title: 'Settings' }}
+            />
         </Tabs>
     );
 }
 
 export default function App() {
     return (
-
-            <Stack.Navigator>
-                <Stack.Screen
-                    name="Feed"
-                    component={Feed}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Episodes"
-                    component={EpisodesScreen}
-                />
-                <Stack.Screen
-                    name="About"
-                    component={AboutScreen}
-                />
-                <Stack.Screen
-                    name="Player"
-                    component={PlayerScreen}
-                />
-            </Stack.Navigator>
-
+        <Stack.Navigator>
+            <Stack.Screen
+                name="Back"
+                component={Back}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Episodes"
+                component={EpisodesScreen}
+            />
+            <Stack.Screen
+                name="Player"
+                component={PlayerScreen}
+            />
+            <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="About"
+                component={AboutScreen}
+            />
+        </Stack.Navigator>
     );
 }
+
+
 
 
 

@@ -1,30 +1,21 @@
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-
 import React from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styled } from 'nativewind';
-import { type IconProps } from '@expo/vector-icons/build/createIconSet';
-import { type ComponentProps } from 'react';
+import { ComponentProps } from 'react';
 
-const StyledIonicons = styled(Ionicons);
+const StyledMaterialCommunityIcons = styled(MaterialCommunityIcons);
 
-type IconName =
-    | 'home'
-    | 'home-outline'
-    | 'mic'
-    | 'mic-outline'
-    | 'search'
-    | 'search-outline'
-    | 'star'
-    | 'star-outline'
-    | 'bookmark'
-    | 'bookmark-outline';
+type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-interface TabBarIconProps extends IconProps<ComponentProps<typeof Ionicons>['name']> {
+interface TabBarIconProps extends ComponentProps<typeof MaterialCommunityIcons> {
   name: IconName;
   className?: string;
 }
 
 export function TabBarIcon({ name, className, ...rest }: TabBarIconProps) {
-  return <StyledIonicons name={name} size={28} className={className} {...rest} />;
+  return <StyledMaterialCommunityIcons name={name} size={28} className={className} {...rest} />;
 }
+
+
+
+

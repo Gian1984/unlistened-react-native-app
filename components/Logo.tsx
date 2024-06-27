@@ -6,15 +6,15 @@ const Logo = () => {
 
     return (
         <TouchableOpacity >
-            <Image source={require('@/assets/images/unlistened_transparen_logo_176.png')} style={styles.logo} />
+            <Image source={require('@/assets/images/unlistened_transparen_logo_300.png')} style={styles.logo} />
         </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
     logo: {
-        width: 50,
-        height: 50,
+        width: 300,
+        height: 300,
     },
 });
 

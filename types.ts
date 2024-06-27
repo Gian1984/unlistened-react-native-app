@@ -31,6 +31,24 @@ export interface FeedInfo {
     newestItemPublishTime:number;
 }
 
+export type IconName =
+    | 'home'
+    | 'home-outline'
+    | 'mic'
+    | 'mic-outline'
+    | 'search'
+    | 'search-outline'
+    | 'star'
+    | 'star-outline'
+    | 'star-cog'
+    | 'star-cog-outline'
+    | 'bookmark'
+    | 'bookmark-outline'
+    | 'setting'
+    | 'setting-outline'; // Add any other icons you are using
+
+
+
 export type RootStackParamList = {
     Home: undefined;
     Podcasts: undefined;
@@ -40,5 +58,6 @@ export type RootStackParamList = {
     Episodes: { id: number };
     Player: { episode: Episode };
     About: undefined;
-    Feed: undefined;
+    Settings: undefined;
+    Back: undefined;
 };

@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a873fc7-52ea-4a3d-8863-afd309bb4b41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/screens/player.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(tabs)/settings.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/unlistened_transparen_logo_1563.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/unlistened_transparen_logo_300.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/index.tsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/podcasts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/podcasts.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/screens/episodes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/screens/episodes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/screens/about.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/screens/about.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Logo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/navigation/TabBarIcon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/navigation/TabBarIcon.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types.ts" afterDir="false" />
@@ -37,22 +42,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/gianlucatiengo/Documents/Progetti/unlistened-react-native-app&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/gianlucatiengo/Documents/Progetti/unlistened-react-native-app/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/gianlucatiengo/Documents/Progetti/unlistened-react-native-app/assets/images",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/Users/gianlucatiengo/Documents/Progetti/unlistened-react-native-app/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/images" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/screens" />
       <recent name="$PROJECT_DIR$/app" />
@@ -76,7 +84,7 @@
       <workItem from="1718952375138" duration="499000" />
       <workItem from="1718952897641" duration="2682000" />
       <workItem from="1718988751227" duration="14309000" />
-      <workItem from="1719319934499" duration="33893000" />
+      <workItem from="1719319934499" duration="41743000" />
     </task>
     <servers />
   </component>
