@@ -1,61 +1,33 @@
-import React, { useState, useEffect } from 'react';
+// src/app/screens/player.tsx
+
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
-import { RootStackParamList, Episode } from '@/types';
+import { RootStackParamList } from '@/types';
 import { PlayIcon, PauseIcon } from 'react-native-heroicons/outline';
 import { ThemedView } from '@/components/ThemedView';
+import { useAudio } from '@/context/AudioContext';
 
 type PlayerScreenRouteProp = RouteProp<RootStackParamList, 'Player'>;
 
 const PlayerScreen: React.FC = () => {
     const route = useRoute<PlayerScreenRouteProp>();
     const { episode } = route.params;
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const { isPlaying, togglePlayPause, setEpisode } = useAudio();
     const [duration, setDuration] = useState<number>(0);
     const [position, setPosition] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const loadSound = async () => {
-            const { sound } = await Audio.Sound.createAsync(
-                { uri: episode.enclosureUrl },
-                { shouldPlay: false }
-            );
-            setSound(sound);
-
-            sound.setOnPlaybackStatusUpdate((status) => {
-                if (status.isLoaded) {
-                    setDuration(status.durationMillis || 0);
-                    setPosition(status.positionMillis || 0);
-                }
-            });
-
+        const loadEpisode = async () => {
+            await setEpisode(episode);
             setLoading(false);
         };
 
-        loadSound();
-
-        return () => {
-            if (sound) {
-                sound.unloadAsync();
-            }
-        };
-    }, [episode.enclosureUrl]);
-
-    const togglePlayPause = async () => {
-        if (sound) {
-            if (isPlaying) {
-                await sound.pauseAsync();
-            } else {
-                await sound.playAsync();
-            }
-            setIsPlaying(!isPlaying);
-        }
-    };
+        loadEpisode();
+    }, [episode]);
 
     const getReadableTime = (millis: number) => {
         const minutes = Math.floor(millis / 60000);
@@ -64,9 +36,7 @@ const PlayerScreen: React.FC = () => {
     };
 
     const onSliderValueChange = async (value: number) => {
-        if (sound) {
-            await sound.setPositionAsync(value);
-        }
+        // Implement slider value change functionality
     };
 
     if (loading) {
@@ -138,6 +108,11 @@ const styles = StyleSheet.create({
 });
 
 export default PlayerScreen;
+
+
+
+
+
 
 
 

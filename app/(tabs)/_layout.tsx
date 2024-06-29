@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
@@ -13,13 +13,17 @@ import { RootStackParamList } from '@/types';
 import { ComponentProps } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SettingsScreen from "@/app/(tabs)/settings";
+import { Provider } from 'react-redux';
+import store from '@/store/store';
+import MiniPlayer from '@/components/MiniPlayer'; // Ensure correct import path
+import { AudioProvider } from '@/context/AudioContext'; // Import AudioProvider
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     search: { focused: 'magnify', unfocused: 'magnify' },
     favourites: { focused: 'star', unfocused: 'star-outline' },
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
     settings: { focused: 'cog', unfocused: 'cog-outline' },
-    index:{ focused: 'microphone', unfocused: 'microphone-outline' },
+    index: { focused: 'microphone', unfocused: 'microphone-outline' },
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -29,7 +33,7 @@ function Back() {
 
     return (
         <Tabs
-            initialRouteName="podcasts"
+            initialRouteName="index"
             screenOptions={({ route }) => {
                 const icons = iconNames[route.name] || { focused: 'home', unfocused: 'home-outline' };
                 return {
@@ -83,36 +87,44 @@ function Back() {
 
 export default function App() {
     return (
-        <Stack.Navigator>
-            <Stack.Screen
-                name="Back"
-                component={Back}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="Episodes"
-                component={EpisodesScreen}
-            />
-            <Stack.Screen
-                name="Player"
-                component={PlayerScreen}
-            />
-            <Stack.Screen
-                name="Settings"
-                component={SettingsScreen}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="About"
-                component={AboutScreen}
-            />
-            <Stack.Screen
-                name="Terms"
-                component={TermsScreen}
-            />
-        </Stack.Navigator>
+        <Provider store={store}>
+            <AudioProvider>
+                <View style={{ flex: 1 }}>
+                    <Stack.Navigator>
+                        <Stack.Screen
+                            name="Back"
+                            component={Back}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Episodes"
+                            component={EpisodesScreen}
+                        />
+                        <Stack.Screen
+                            name="Player"
+                            component={PlayerScreen}
+                        />
+                        <Stack.Screen
+                            name="Settings"
+                            component={SettingsScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="About"
+                            component={AboutScreen}
+                        />
+                        <Stack.Screen
+                            name="Terms"
+                            component={TermsScreen}
+                        />
+                    </Stack.Navigator>
+                    <MiniPlayer />
+                </View>
+            </AudioProvider>
+        </Provider>
     );
 }
+
 
 
 
