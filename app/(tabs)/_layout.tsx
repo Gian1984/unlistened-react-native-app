@@ -19,7 +19,7 @@ import MiniPlayer from '@/components/MiniPlayer'; // Ensure correct import path
 import { AudioProvider, useAudio } from '@/context/AudioContext'; // Import AudioProvider
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
-    search: { focused: 'magnify', unfocused: 'magnify' },
+    downloads: { focused: 'download', unfocused: 'download-outline' },
     favourites: { focused: 'star', unfocused: 'star-outline' },
     bookmarks: { focused: 'bookmark', unfocused: 'bookmark-outline' },
     settings: { focused: 'cog', unfocused: 'cog-outline' },
@@ -69,8 +69,8 @@ function Back() {
                 options={{ title: 'Podcasts' }}
             />
             <Tabs.Screen
-                name="search"
-                options={{ title: 'Search' }}
+                name="downloads"
+                options={{ title: 'Downloads' }}
             />
             <Tabs.Screen
                 name="favourites"

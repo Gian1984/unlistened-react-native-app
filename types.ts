@@ -51,7 +51,7 @@ export type IconName =
 
 export type RootStackParamList = {
     Home: undefined;
-    Search: undefined;
+    Downloads: undefined;
     Favourites: undefined;
     Bookmarks: undefined;
     Episodes: { id: number };

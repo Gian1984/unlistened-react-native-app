@@ -130,9 +130,13 @@ export default function PodcastsScreen() {
                         </ThemedView>
                         <ThemedView className="pt-3 pb-12">
                             <SearchField onSearch={handleSearch} />
-                            {searchPerformed && (
-                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex"  onPress={handleBackToAll}>
-                                    <Text className="text-white text-center font-bold" >Back to All Podcasts</Text>
+                            {searchPerformed ? (
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={handleBackToAll}>
+                                    <Text className="text-white text-center font-bold">Back to All Podcasts</Text>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={fetchData}>
+                                    <Text className="text-white text-center font-bold">Refresh list</Text>
                                 </TouchableOpacity>
                             )}
                         </ThemedView>
@@ -191,7 +195,7 @@ export default function PodcastsScreen() {
                 ListFooterComponent={() =>
                     visibleCount < podcasts.length ? (
                         <TouchableOpacity
-                            className="bg-indigo-700 py-4 px-4 mx-1 rounded-full flex"
+                            className="bg-indigo-700 py-3 mt-2 rounded-full flex"
                             onPress={loadMore}
                         >
                             <Text className="text-white text-center font-bold">Load More...</Text>

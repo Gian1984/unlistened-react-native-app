@@ -29,7 +29,7 @@ const PlayerScreen: React.FC = () => {
 
     if (loading) {
         return (
-            <ThemedView className="bg-white min-h-screen">
+            <ThemedView className="bg-white h-full">
                 <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
                     <ActivityIndicator size="large" color="#ec4899" />
                     <Text>Loading...</Text>
@@ -39,7 +39,7 @@ const PlayerScreen: React.FC = () => {
     }
 
     return (
-        <ThemedView className="bg-white min-h-screen">
+        <ThemedView className="bg-white h-full">
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
                     <Text className="text-3xl font-bold text-gray-900" numberOfLines={3}>{episode.title}</Text>
