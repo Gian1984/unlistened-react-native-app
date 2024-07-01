@@ -1,15 +1,14 @@
-// src/components/MiniPlayer.tsx
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { useAudio } from '@/context/AudioContext';
-import { PlayIcon, PauseIcon, XMarkIcon } from 'react-native-heroicons/outline'; // Import XIcon
+import { PlayIcon, PauseIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '@/types'; // Import the type
+import { RootStackParamList } from '@/types';
 
 const MiniPlayer: React.FC = () => {
-    const { isPlaying, episode, togglePlayPause, stop } = useAudio();
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Ensure correct typing
+    const { isPlaying, episode, togglePlayPause, stop, position, duration, seekTo } = useAudio();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     if (!episode) {
         return null;
@@ -19,20 +18,43 @@ const MiniPlayer: React.FC = () => {
         navigation.navigate('Player', { episode });
     };
 
+    const getReadableTime = (millis: number) => {
+        const minutes = Math.floor(millis / 60000);
+        const seconds = ((millis % 60000) / 1000).toFixed(0);
+        return `${minutes}:${seconds.length === 1 ? '0' : ''}${seconds}`;
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.content} onPress={openPlayer}>
-                <Text style={styles.title}>{episode.title}</Text>
+                <View style={styles.textContainer}>
+                    <Text style={styles.title} numberOfLines={1}>{episode.title}</Text>
+                    <View style={styles.timeContainer}>
+                        <Text style={styles.timeText}>{getReadableTime(position)}</Text>
+                        <Slider
+                            style={styles.slider}
+                            minimumValue={0}
+                            maximumValue={duration}
+                            value={position}
+                            onValueChange={() => {}}
+                            onSlidingComplete={seekTo}
+                            minimumTrackTintColor="#ec4899"
+                            maximumTrackTintColor="#d3d3d3"
+                            thumbTintColor="#4f46e5"
+                        />
+                        <Text style={styles.timeText}>{getReadableTime(duration - position)}</Text>
+                    </View>
+                </View>
                 <TouchableOpacity onPress={togglePlayPause} style={styles.button}>
                     {isPlaying ? (
-                        <PauseIcon className="h-2 w-2" color="white" />
+                        <PauseIcon className="h-3 w-3" color="white" />
                     ) : (
-                        <PlayIcon className="h-2 w-2" color="white" />
+                        <PlayIcon className="h-3 w-3" color="white" />
                     )}
                 </TouchableOpacity>
             </TouchableOpacity>
             <TouchableOpacity onPress={stop} style={styles.closeButton}>
-                <XMarkIcon className="h-2 w-2" color="white" />
+                <XMarkIcon className="h-3 w-3" color="white" />
             </TouchableOpacity>
         </View>
     );
@@ -41,25 +63,39 @@ const MiniPlayer: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        top: 0,
+        bottom: 0,
         left: 0,
         right: 0,
         backgroundColor: '#ffffff',
-        paddingTop:50,
-        padding: 15,
+        padding: 20,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
     },
     content: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
     },
+    textContainer: {
+        flex: 1,
+        paddingRight: 20,
+    },
     title: {
-        fontSize: 16,
+        fontSize: 14,
         color: '#4f46e5',
+        marginBottom: 5,
+    },
+    timeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    timeText: {
+        fontSize: 12,
+        color: '#4f46e5',
+    },
+    slider: {
+        flex: 1,
+        marginHorizontal: 5,
     },
     button: {
         backgroundColor: '#ec4899',
@@ -75,6 +111,7 @@ const styles = StyleSheet.create({
 });
 
 export default MiniPlayer;
+
 
 
 

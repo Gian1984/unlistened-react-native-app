@@ -1,5 +1,4 @@
 // src/context/AudioContext.tsx
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Audio } from 'expo-av';
 import { Episode } from '@/types';
@@ -7,9 +6,14 @@ import { Episode } from '@/types';
 interface AudioContextProps {
     isPlaying: boolean;
     episode: Episode | null;
+    position: number;
+    duration: number;
     togglePlayPause: () => void;
     setEpisode: (episode: Episode) => void;
     stop: () => void;
+    isMiniPlayerVisible: boolean;
+    setMiniPlayerVisible: (visible: boolean) => void;
+    seekTo: (position: number) => void;
 }
 
 const AudioContext = createContext<AudioContextProps | undefined>(undefined);
@@ -18,6 +22,9 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [episode, setEpisodeState] = useState<Episode | null>(null);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
+    const [position, setPosition] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(0);
+    const [isMiniPlayerVisible, setMiniPlayerVisible] = useState<boolean>(false);
 
     useEffect(() => {
         return () => {
@@ -48,9 +55,17 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             { shouldPlay: false }
         );
 
+        newSound.setOnPlaybackStatusUpdate((status) => {
+            if (status.isLoaded) {
+                setDuration(status.durationMillis || 0);
+                setPosition(status.positionMillis || 0);
+            }
+        });
+
         setSound(newSound);
         setEpisodeState(newEpisode);
         setIsPlaying(false);
+        setMiniPlayerVisible(true); // Show MiniPlayer when episode is set
     };
 
     const stop = async () => {
@@ -60,11 +75,18 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             setSound(null);
             setEpisodeState(null);
             setIsPlaying(false);
+            setMiniPlayerVisible(false); // Hide MiniPlayer when stopped
+        }
+    };
+
+    const seekTo = async (position: number) => {
+        if (sound) {
+            await sound.setPositionAsync(position);
         }
     };
 
     return (
-        <AudioContext.Provider value={{ isPlaying, episode, togglePlayPause, setEpisode, stop }}>
+        <AudioContext.Provider value={{ isPlaying, episode, position, duration, togglePlayPause, setEpisode, stop, isMiniPlayerVisible, setMiniPlayerVisible, seekTo }}>
             {children}
         </AudioContext.Provider>
     );
@@ -77,5 +99,8 @@ export const useAudio = () => {
     }
     return context;
 };
+
+
+
 
 

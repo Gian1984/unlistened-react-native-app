@@ -16,7 +16,7 @@ import SettingsScreen from "@/app/(tabs)/settings";
 import { Provider } from 'react-redux';
 import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer'; // Ensure correct import path
-import { AudioProvider } from '@/context/AudioContext'; // Import AudioProvider
+import { AudioProvider, useAudio } from '@/context/AudioContext'; // Import AudioProvider
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     search: { focused: 'magnify', unfocused: 'magnify' },
@@ -30,6 +30,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function Back() {
     const colorScheme = useColorScheme();
+    const { isMiniPlayerVisible } = useAudio();
 
     return (
         <Tabs
@@ -55,8 +56,10 @@ function Back() {
                     ),
                     tabBarStyle: {
                         borderTopWidth: 0,
+                        height: isMiniPlayerVisible ? 150 : 100,
                         elevation: 0,
                         shadowOpacity: 0,
+                        paddingBottom: isMiniPlayerVisible ? 100 : 50,
                     },
                 };
             }}
@@ -124,6 +127,7 @@ export default function App() {
         </Provider>
     );
 }
+
 
 
 
