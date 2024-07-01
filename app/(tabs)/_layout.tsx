@@ -17,6 +17,7 @@ import { Provider } from 'react-redux';
 import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer'; // Ensure correct import path
 import { AudioProvider, useAudio } from '@/context/AudioContext'; // Import AudioProvider
+import { DownloadProvider } from '@/context/DownloadContext';
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     downloads: { focused: 'download', unfocused: 'download-outline' },
@@ -92,37 +93,39 @@ export default function App() {
     return (
         <Provider store={store}>
             <AudioProvider>
-                <View style={{ flex: 1 }}>
-                    <Stack.Navigator>
-                        <Stack.Screen
-                            name="Back"
-                            component={Back}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="Episodes"
-                            component={EpisodesScreen}
-                        />
-                        <Stack.Screen
-                            name="Player"
-                            component={PlayerScreen}
-                        />
-                        <Stack.Screen
-                            name="Settings"
-                            component={SettingsScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="About"
-                            component={AboutScreen}
-                        />
-                        <Stack.Screen
-                            name="Terms"
-                            component={TermsScreen}
-                        />
-                    </Stack.Navigator>
-                    <MiniPlayer />
-                </View>
+                <DownloadProvider>
+                    <View style={{ flex: 1 }}>
+                        <Stack.Navigator>
+                            <Stack.Screen
+                                name="Back"
+                                component={Back}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="Episodes"
+                                component={EpisodesScreen}
+                            />
+                            <Stack.Screen
+                                name="Player"
+                                component={PlayerScreen}
+                            />
+                            <Stack.Screen
+                                name="Settings"
+                                component={SettingsScreen}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="About"
+                                component={AboutScreen}
+                            />
+                            <Stack.Screen
+                                name="Terms"
+                                component={TermsScreen}
+                            />
+                        </Stack.Navigator>
+                        <MiniPlayer />
+                    </View>
+                </DownloadProvider>
             </AudioProvider>
         </Provider>
     );

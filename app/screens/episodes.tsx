@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet} from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { fetchEpisodes, fetchFeedInfo, addFavourite, addBookmark, downloadPodcast } from '@/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
 import { CheckCircleIcon, XMarkIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useDownload } from '@/context/DownloadContext';
 
 type EpisodesScreenRouteProp = RouteProp<RootStackParamList, 'Episodes'>;
 type PlayerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Player'>;
@@ -14,13 +15,15 @@ const EpisodesScreen: React.FC = () => {
     const route = useRoute<EpisodesScreenRouteProp>();
     const navigation = useNavigation<PlayerScreenNavigationProp>();
     const { id } = route.params;
+    const { addDownloadedEpisode } = useDownload();
     const [feedInfo, setFeedInfo] = useState<FeedInfo | null>(null);
     const [episodes, setEpisodes] = useState<Episode[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [visibleCount, setVisibleCount] = useState<number>(10);
     const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
-    const [showNotification, setShowNotification] = useState<boolean>(false);
+    const [downloadingEpisodes, setDownloadingEpisodes] = useState<number[]>([]);
+    const [downloadedEpisodes, setDownloadedEpisodes] = useState<number[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -60,11 +63,16 @@ const EpisodesScreen: React.FC = () => {
     };
 
     const handleDownloadEpisode = async (episode: Episode) => {
+        setDownloadingEpisodes((prev) => [...prev, episode.id]);
         try {
-            await downloadPodcast(episode.title, episode.enclosureUrl, episode.id);
-            navigation.navigate('Downloads');
+            const fileUri = await downloadPodcast(episode.title, episode.enclosureUrl, episode.id);
+            console.log('File downloaded successfully:', fileUri);
+            addDownloadedEpisode(episode);
+            setDownloadedEpisodes((prev) => [...prev, episode.id]);
         } catch (error) {
             console.error('Error downloading episode:', error);
+        } finally {
+            setDownloadingEpisodes((prev) => prev.filter((id) => id !== episode.id));
         }
     };
 
@@ -96,26 +104,6 @@ const EpisodesScreen: React.FC = () => {
         <ScrollView className="bg-white">
             <ThemedView className="flex-1 justify-center items-center">
                 <View className="mx-auto px-6 lg:px-8">
-                    {showNotification && (
-                        <View className="fixed z-10 inset-0 flex items-end px-4 py-6 pointer-events-none">
-                            <View className="flex w-full flex-col items-center space-y-4 sm:items-end">
-                                <View className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 border-2 border-green-500">
-                                    <View className="p-4">
-                                        <View className="flex items-start">
-                                            <CheckCircleIcon className="h-6 w-6 text-green-400" />
-                                            <View className="ml-3 w-0 flex-1 pt-0.5">
-                                                <Text className="text-sm font-medium text-gray-900">Successfully added!</Text>
-                                            </View>
-                                            <TouchableOpacity onPress={() => setShowNotification(false)} className="ml-4 flex flex-shrink-0">
-                                                <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                    )}
-
                     {feedInfo && !error && (
                         <View className="bg-white pb-24 pt-6">
                             <View className="mx-auto">
@@ -156,7 +144,13 @@ const EpisodesScreen: React.FC = () => {
                                                         </TouchableOpacity>
                                                         <TouchableOpacity onPress={() => handleDownloadEpisode(episode)}
                                                                           className="bg-pink-500 text-white font-bold py-2 px-4 mx-1 rounded-full">
-                                                            <ArrowDownTrayIcon className="h-5 w-5" color="white" />
+                                                            {downloadingEpisodes.includes(episode.id) ? (
+                                                                <ActivityIndicator size="small" color="white" />
+                                                            ) : downloadedEpisodes.includes(episode.id) ? (
+                                                                <CheckCircleIcon className="h-5 w-5" color="white" />
+                                                            ) : (
+                                                                <ArrowDownTrayIcon className="h-5 w-5" color="white" />
+                                                            )}
                                                         </TouchableOpacity>
                                                     </View>
                                                 </View>
@@ -210,4 +204,5 @@ const styles = StyleSheet.create({
 });
 
 export default EpisodesScreen;
+
 

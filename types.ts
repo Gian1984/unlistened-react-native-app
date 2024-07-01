@@ -17,6 +17,7 @@ export interface Episode {
     enclosureUrl: string;
     feedImage: string;
     datePublished: number;
+    feedId: number; // Add this line
 }
 
 export interface FeedInfo {
