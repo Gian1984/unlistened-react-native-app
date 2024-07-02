@@ -1,33 +1,46 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// src/context/DownloadContext.tsx
+import React, { createContext, useContext, useState } from 'react';
 import { Episode } from '@/types';
+import { downloadPodcast } from '@/api';
 
-type DownloadContextType = {
+interface DownloadContextProps {
     downloadedEpisodes: Episode[];
-    addDownloadedEpisode: (episode: Episode) => void;
-};
+    downloadEpisode: (episode: Episode) => Promise<void>;
+}
 
-const DownloadContext = createContext<DownloadContextType | undefined>(undefined);
+const DownloadContext = createContext<DownloadContextProps | undefined>(undefined);
 
-export const DownloadProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [downloadedEpisodes, setDownloadedEpisodes] = useState<Episode[]>([]);
 
-    const addDownloadedEpisode = (episode: Episode) => {
-        setDownloadedEpisodes((prevEpisodes) => [...prevEpisodes, episode]);
+    const downloadEpisode = async (episode: Episode) => {
+        try {
+            const uri = await downloadPodcast(episode.title, episode.enclosureUrl, episode.id);
+            const updatedEpisode = { ...episode, downloadedUri: uri };
+            setDownloadedEpisodes((prev) => [...prev, updatedEpisode]);
+        } catch (error) {
+            console.error('Error downloading episode:', error);
+        }
     };
 
     return (
-        <DownloadContext.Provider value={{ downloadedEpisodes, addDownloadedEpisode }}>
+        <DownloadContext.Provider value={{ downloadedEpisodes, downloadEpisode }}>
             {children}
         </DownloadContext.Provider>
     );
 };
 
-export const useDownload = (): DownloadContextType => {
+export const useDownload = () => {
     const context = useContext(DownloadContext);
-    if (!context) {
+    if (context === undefined) {
         throw new Error('useDownload must be used within a DownloadProvider');
     }
     return context;
 };
+
+
+
+
+
 
 

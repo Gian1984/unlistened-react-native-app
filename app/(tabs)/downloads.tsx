@@ -8,8 +8,8 @@ import { Episode } from '@/types';
 import { PlayIcon } from 'react-native-heroicons/outline';
 
 const Downloads: React.FC = () => {
-    const { downloadedEpisodes } = useDownload();
-    const { setEpisode, togglePlayPause, isPlaying, isMiniPlayerVisible, setMiniPlayerVisible } = useAudio();
+    const { downloadedEpisodes, downloadEpisode } = useDownload();
+    const { setEpisode, togglePlayPause, isPlaying, setMiniPlayerVisible } = useAudio();
 
     const handlePlayEpisode = (episode: Episode) => {
         setEpisode(episode);
@@ -17,6 +17,10 @@ const Downloads: React.FC = () => {
             togglePlayPause();
         }
         setMiniPlayerVisible(true);
+    };
+
+    const handleDownloadEpisode = async (episode: Episode) => {
+        await downloadEpisode(episode);
     };
 
     return (
@@ -33,12 +37,21 @@ const Downloads: React.FC = () => {
                             <View>
                                 <Text style={styles.episodeTitle}>{episode.title}</Text>
                                 <Text style={styles.episodeDate}>{episode.datePublishedPretty}</Text>
-                                <TouchableOpacity
-                                    className="bg-indigo-700 py-3 mt-2 rounded-full flex"
-                                    onPress={() => handlePlayEpisode(episode)}
-                                >
-                                    <Text className="text-white text-center font-bold">Play</Text>
-                                </TouchableOpacity>
+                                {episode.downloadedUri ? (
+                                    <TouchableOpacity
+                                        className="bg-indigo-700 py-3 mt-2 rounded-full flex"
+                                        onPress={() => handlePlayEpisode(episode)}
+                                    >
+                                        <Text className="text-white text-center font-bold">Play</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        className="bg-gray-700 py-3 mt-2 rounded-full flex"
+                                        onPress={() => handleDownloadEpisode(episode)}
+                                    >
+                                        <Text className="text-white text-center font-bold">Download</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         </ThemedView>
                     ))
@@ -87,6 +100,8 @@ const styles = StyleSheet.create({
 });
 
 export default Downloads;
+
+
 
 
 

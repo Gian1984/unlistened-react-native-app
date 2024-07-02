@@ -1,10 +1,11 @@
+// src/screens/EpisodesScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { fetchEpisodes, fetchFeedInfo, addFavourite, addBookmark, downloadPodcast } from '@/api';
+import { fetchEpisodes, fetchFeedInfo, addBookmark, downloadPodcast } from '@/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
-import { CheckCircleIcon, XMarkIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
+import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDownload } from '@/context/DownloadContext';
 
@@ -15,7 +16,7 @@ const EpisodesScreen: React.FC = () => {
     const route = useRoute<EpisodesScreenRouteProp>();
     const navigation = useNavigation<PlayerScreenNavigationProp>();
     const { id } = route.params;
-    const { addDownloadedEpisode } = useDownload();
+    const { downloadedEpisodes, downloadEpisode } = useDownload();
     const [feedInfo, setFeedInfo] = useState<FeedInfo | null>(null);
     const [episodes, setEpisodes] = useState<Episode[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -23,7 +24,6 @@ const EpisodesScreen: React.FC = () => {
     const [visibleCount, setVisibleCount] = useState<number>(10);
     const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
     const [downloadingEpisodes, setDownloadingEpisodes] = useState<number[]>([]);
-    const [downloadedEpisodes, setDownloadedEpisodes] = useState<number[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -65,14 +65,10 @@ const EpisodesScreen: React.FC = () => {
     const handleDownloadEpisode = async (episode: Episode) => {
         setDownloadingEpisodes((prev) => [...prev, episode.id]);
         try {
-            const fileUri = await downloadPodcast(episode.title, episode.enclosureUrl, episode.id);
-            console.log('File downloaded successfully:', fileUri);
-            addDownloadedEpisode(episode);
-            setDownloadedEpisodes((prev) => [...prev, episode.id]);
+            await downloadEpisode(episode);
+            setDownloadingEpisodes((prev) => prev.filter((id) => id !== episode.id));
         } catch (error) {
             console.error('Error downloading episode:', error);
-        } finally {
-            setDownloadingEpisodes((prev) => prev.filter((id) => id !== episode.id));
         }
     };
 
@@ -146,7 +142,7 @@ const EpisodesScreen: React.FC = () => {
                                                                           className="bg-pink-500 text-white font-bold py-2 px-4 mx-1 rounded-full">
                                                             {downloadingEpisodes.includes(episode.id) ? (
                                                                 <ActivityIndicator size="small" color="white" />
-                                                            ) : downloadedEpisodes.includes(episode.id) ? (
+                                                            ) : downloadedEpisodes.find(ep => ep.id === episode.id) ? (
                                                                 <CheckCircleIcon className="h-5 w-5" color="white" />
                                                             ) : (
                                                                 <ArrowDownTrayIcon className="h-5 w-5" color="white" />
@@ -181,7 +177,6 @@ const stripHtmlTags = (str: string): string => {
 };
 
 const styles = StyleSheet.create({
-
     headerImage: {
         color: '#808080',
         bottom: -90,
@@ -196,7 +191,6 @@ const styles = StyleSheet.create({
         gap: 20,
         marginBottom: 8,
     },
-
     titleContainer: {
         flexDirection: 'row',
         gap: 8,
@@ -204,5 +198,6 @@ const styles = StyleSheet.create({
 });
 
 export default EpisodesScreen;
+
 
 

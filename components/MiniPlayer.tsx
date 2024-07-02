@@ -1,3 +1,4 @@
+// src/components/MiniPlayer.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -30,6 +31,9 @@ const MiniPlayer: React.FC = () => {
                 <View style={styles.textContainer}>
                     <Text style={styles.title} numberOfLines={1}>
                         {episode.title}
+                    </Text>
+                    <Text style={styles.sourceText}>
+                        {episode.downloadedUri ? 'Playing from downloads' : 'Streaming live'}
                     </Text>
                     <View style={styles.timeContainer}>
                         <Text style={styles.timeText}>{getReadableTime(position)}</Text>
@@ -93,11 +97,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         color: '#4f46e5',
     },
-    tabTitle: {
-        color: '#4f46e5', // Color when in a tab
-    },
-    nonTabTitle: {
-        color: '#ec4899', // Color when not in a tab
+    sourceText: {
+        fontSize: 12,
+        color: 'gray',
     },
     timeContainer: {
         flexDirection: 'row',
@@ -125,6 +127,7 @@ const styles = StyleSheet.create({
 });
 
 export default MiniPlayer;
+
 
 
 

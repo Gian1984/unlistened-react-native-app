@@ -54,7 +54,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
 
         const { sound: newSound } = await Audio.Sound.createAsync(
-            { uri: newEpisode.enclosureUrl },
+            { uri: newEpisode.downloadedUri || newEpisode.enclosureUrl },
             { shouldPlay: false }
         );
 
@@ -102,6 +102,9 @@ export const useAudio = () => {
     }
     return context;
 };
+
+
+
 
 
 
