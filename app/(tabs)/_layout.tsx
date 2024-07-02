@@ -1,22 +1,24 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useFocusEffect } from '@react-navigation/native';
 import EpisodesScreen from "@/app/screens/episodes";
 import AboutScreen from "@/app/screens/about";
 import TermsScreen from "@/app/screens/terms";
 import PlayerScreen from "@/app/screens/player";
+import DownloadsScreen from "@/app/(tabs)/downloads";
 import { RootStackParamList } from '@/types';
 import { ComponentProps } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SettingsScreen from "@/app/(tabs)/settings";
 import { Provider } from 'react-redux';
 import store from '@/store/store';
-import MiniPlayer from '@/components/MiniPlayer'; // Ensure correct import path
-import { AudioProvider, useAudio } from '@/context/AudioContext'; // Import AudioProvider
+import MiniPlayer from '@/components/MiniPlayer';
+import { AudioProvider, useAudio } from '@/context/AudioContext';
 import { DownloadProvider } from '@/context/DownloadContext';
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
@@ -31,7 +33,14 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function Back() {
     const colorScheme = useColorScheme();
-    const { isMiniPlayerVisible } = useAudio();
+    const { isMiniPlayerVisible, setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(true);
+            return () => setIsTab(false);
+        }, [setIsTab])
+    );
 
     return (
         <Tabs
@@ -57,10 +66,9 @@ function Back() {
                     ),
                     tabBarStyle: {
                         borderTopWidth: 0,
-                        height: isMiniPlayerVisible ? 150 : 100,
+                        height: 100,
                         elevation: 0,
                         shadowOpacity: 0,
-                        paddingBottom: isMiniPlayerVisible ? 100 : 50,
                     },
                 };
             }}
@@ -89,6 +97,78 @@ function Back() {
     );
 }
 
+function Episodes() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <EpisodesScreen />;
+}
+
+function Player() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <PlayerScreen />;
+}
+
+function Downloads() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <DownloadsScreen />;
+}
+
+function Settings() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <SettingsScreen />;
+}
+
+function About() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <AboutScreen />;
+}
+
+function Terms() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <TermsScreen />;
+}
+
 export default function App() {
     return (
         <Provider store={store}>
@@ -102,25 +182,30 @@ export default function App() {
                                 options={{ headerShown: false }}
                             />
                             <Stack.Screen
+                                name="Downloads"
+                                component={Downloads}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
                                 name="Episodes"
-                                component={EpisodesScreen}
+                                component={Episodes}
                             />
                             <Stack.Screen
                                 name="Player"
-                                component={PlayerScreen}
+                                component={Player}
                             />
                             <Stack.Screen
                                 name="Settings"
-                                component={SettingsScreen}
+                                component={Settings}
                                 options={{ headerShown: false }}
                             />
                             <Stack.Screen
                                 name="About"
-                                component={AboutScreen}
+                                component={About}
                             />
                             <Stack.Screen
                                 name="Terms"
-                                component={TermsScreen}
+                                component={Terms}
                             />
                         </Stack.Navigator>
                         <MiniPlayer />

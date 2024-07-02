@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
 import { useDownload } from '@/context/DownloadContext';
 import { useAudio } from '@/context/AudioContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,17 +29,18 @@ const Downloads: React.FC = () => {
                     <Text style={styles.noEpisodesText}>No downloaded episodes.</Text>
                 ) : (
                     downloadedEpisodes.map((episode) => (
-                        <View key={episode.id} style={styles.episodeContainer}>
-                            <Text style={styles.episodeTitle}>{episode.title}</Text>
-                            <Text style={styles.episodeDate}>{episode.datePublishedPretty}</Text>
-                            <TouchableOpacity
-                                style={styles.playButton}
-                                onPress={() => handlePlayEpisode(episode)}
-                            >
-                                <PlayIcon className="h-5 w-5" color="white" />
-                                <Text style={styles.playButtonText}>Play</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <ThemedView key={episode.id} className="py-6 border-b border-gray-300">
+                            <View>
+                                <Text style={styles.episodeTitle}>{episode.title}</Text>
+                                <Text style={styles.episodeDate}>{episode.datePublishedPretty}</Text>
+                                <TouchableOpacity
+                                    className="bg-indigo-700 py-3 mt-2 rounded-full flex"
+                                    onPress={() => handlePlayEpisode(episode)}
+                                >
+                                    <Text className="text-white text-center font-bold">Play</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </ThemedView>
                     ))
                 )}
             </ScrollView>
@@ -60,9 +62,6 @@ const styles = StyleSheet.create({
 
     noEpisodesText: {
         fontSize: 16,
-    },
-    episodeContainer: {
-        marginBottom: 20,
     },
     episodeTitle: {
         fontSize: 16,

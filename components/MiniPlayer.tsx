@@ -7,7 +7,7 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/types';
 
 const MiniPlayer: React.FC = () => {
-    const { isPlaying, episode, togglePlayPause, stop, position, duration, seekTo } = useAudio();
+    const { isPlaying, episode, togglePlayPause, stop, position, duration, seekTo, isTab } = useAudio();
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     if (!episode) {
@@ -25,10 +25,12 @@ const MiniPlayer: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, isTab ? styles.tabContainer : styles.nonTabContainer]}>
             <TouchableOpacity style={styles.content} onPress={openPlayer}>
                 <View style={styles.textContainer}>
-                    <Text style={styles.title} numberOfLines={1}>{episode.title}</Text>
+                    <Text style={styles.title} numberOfLines={1}>
+                        {episode.title}
+                    </Text>
                     <View style={styles.timeContainer}>
                         <Text style={styles.timeText}>{getReadableTime(position)}</Text>
                         <Slider
@@ -63,13 +65,19 @@ const MiniPlayer: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 0,
         left: 0,
         right: 0,
         backgroundColor: '#ffffff',
         padding: 20,
         flexDirection: 'row',
         alignItems: 'center',
+        zIndex: 10,
+    },
+    tabContainer: {
+        bottom: 100,
+    },
+    nonTabContainer: {
+        bottom: 0,
     },
     content: {
         flexDirection: 'row',
@@ -82,8 +90,14 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 14,
-        color: '#4f46e5',
         marginBottom: 5,
+        color: '#4f46e5',
+    },
+    tabTitle: {
+        color: '#4f46e5', // Color when in a tab
+    },
+    nonTabTitle: {
+        color: '#ec4899', // Color when not in a tab
     },
     timeContainer: {
         flexDirection: 'row',
@@ -111,6 +125,8 @@ const styles = StyleSheet.create({
 });
 
 export default MiniPlayer;
+
+
 
 
 

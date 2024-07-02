@@ -14,6 +14,8 @@ interface AudioContextProps {
     isMiniPlayerVisible: boolean;
     setMiniPlayerVisible: (visible: boolean) => void;
     seekTo: (position: number) => void;
+    isTab: boolean;
+    setIsTab: (isTab: boolean) => void;
 }
 
 const AudioContext = createContext<AudioContextProps | undefined>(undefined);
@@ -25,6 +27,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [position, setPosition] = useState<number>(0);
     const [duration, setDuration] = useState<number>(0);
     const [isMiniPlayerVisible, setMiniPlayerVisible] = useState<boolean>(false);
+    const [isTab, setIsTab] = useState<boolean>(false);
 
     useEffect(() => {
         return () => {
@@ -86,7 +89,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
 
     return (
-        <AudioContext.Provider value={{ isPlaying, episode, position, duration, togglePlayPause, setEpisode, stop, isMiniPlayerVisible, setMiniPlayerVisible, seekTo }}>
+        <AudioContext.Provider value={{ isPlaying, episode, position, duration, togglePlayPause, setEpisode, stop, isMiniPlayerVisible, setMiniPlayerVisible, seekTo, isTab, setIsTab }}>
             {children}
         </AudioContext.Provider>
     );
@@ -99,6 +102,7 @@ export const useAudio = () => {
     }
     return context;
 };
+
 
 
 
