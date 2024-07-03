@@ -10,6 +10,8 @@ import EpisodesScreen from "@/app/screens/episodes";
 import AboutScreen from "@/app/screens/about";
 import TermsScreen from "@/app/screens/terms";
 import PlayerScreen from "@/app/screens/player";
+import LoginScreen from "@/app/screens/login";
+import SignScreen from "@/app/screens/signup";
 import DownloadsScreen from "@/app/(tabs)/downloads";
 import { RootStackParamList } from '@/types';
 import { ComponentProps } from 'react';
@@ -20,6 +22,7 @@ import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer';
 import { AudioProvider, useAudio } from '@/context/AudioContext';
 import { DownloadProvider } from '@/context/DownloadContext';
+import SignupScreen from "@/app/screens/signup";
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     downloads: { focused: 'download', unfocused: 'download-outline' },
@@ -169,6 +172,30 @@ function Terms() {
     return <TermsScreen />;
 }
 
+function Login() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <LoginScreen />;
+}
+
+function Sign() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <SignScreen />;
+}
+
 export default function App() {
     return (
         <Provider store={store}>
@@ -206,6 +233,14 @@ export default function App() {
                             <Stack.Screen
                                 name="Terms"
                                 component={Terms}
+                            />
+                            <Stack.Screen
+                                name="Sign"
+                                component={Sign}
+                            />
+                            <Stack.Screen
+                                name="Login"
+                                component={Login}
                             />
                         </Stack.Navigator>
                         <MiniPlayer />

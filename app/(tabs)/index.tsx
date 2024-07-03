@@ -12,6 +12,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
 
 import SearchField from "@/components/SearchField";
 import Logo from "@/components/Logo";
+import Header from '@/components/Header';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -114,6 +115,7 @@ export default function PodcastsScreen() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header />
             <FlatList
                 className="bg-white pb-12"
                 data={podcasts.slice(0, visibleCount)}
