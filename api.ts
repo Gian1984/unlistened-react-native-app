@@ -1,6 +1,7 @@
 // api.ts
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
+import * as Localization from 'expo-localization';
 import { Podcast, Episode, FeedInfo } from './types';
 
 const baseUrl = 'http://localhost';
@@ -9,6 +10,23 @@ const apiClient = axios.create({
     baseURL: baseUrl,
     withCredentials: true,
 });
+
+const getPreferredLanguage = () => {
+    return Localization.locale;
+};
+
+export const detectDeviceLanguage = async (): Promise<void> => {
+    try {
+        const language = getPreferredLanguage();
+        await apiClient.get('/sanctum/csrf-cookie');
+        await apiClient.post('/api/detect-language', {
+            language: language,
+        });
+    } catch (error) {
+        console.error('Error updating device language:', error);
+        throw error;
+    }
+};
 
 export const login = async (email: string, password: string) => {
     try {
@@ -135,7 +153,7 @@ export const fetchCategories = async (): Promise<{ id: number, name: string }[]>
 
 export const fetchPodcastsByCategory = async (categoryId: number): Promise<Podcast[]> => {
     try {
-        const response = await apiClient.get<{ feeds: Podcast[] }>(`/api/feed-cat/${categoryId}`);
+        const response = await apiClient.get<{ feeds: Podcast[] }>(`/api/search-feeds-by-cat/${categoryId}`);
         return response.data.feeds;
     } catch (error) {
         console.error('Error fetching podcasts by category:', error);

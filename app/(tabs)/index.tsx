@@ -8,7 +8,7 @@ import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory } from '@/api';
 import { Podcast, RootStackParamList } from '@/types';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
-type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
+type HomeScreenRouteProp = RouteProp<RootStackParamList, 'index'>;
 
 import SearchField from "@/components/SearchField";
 import Logo from "@/components/Logo";
@@ -30,13 +30,16 @@ export default function PodcastsScreen() {
     const categoryId = route.params?.categoryId;
 
     useEffect(() => {
-        fetchData(categoryId);
+        if (categoryId) {
+            fetchCategoryData(categoryId);
+        } else {
+            fetchData();
+        }
     }, [categoryId]);
 
-    const fetchData = (categoryId?: number) => {
+    const fetchData = () => {
         setLoading(true);
-        const fetchFunction = categoryId ? () => fetchPodcastsByCategory(categoryId) : fetchPodcasts;
-        fetchFunction()
+        fetchPodcasts()
             .then(data => {
                 setPodcasts(data);
                 setError(null);
@@ -44,6 +47,23 @@ export default function PodcastsScreen() {
             .catch(error => {
                 console.error('Error fetching podcasts:', error);
                 setError('Failed to load podcasts. Please try again later.');
+            })
+            .finally(() => {
+                setLoading(false);
+                setSearchPerformed(false);
+            });
+    };
+
+    const fetchCategoryData = (categoryId: number) => {
+        setLoading(true);
+        fetchPodcastsByCategory(categoryId)
+            .then(data => {
+                setPodcasts(data);
+                setError(null);
+            })
+            .catch(error => {
+                console.error('Error fetching podcasts by category:', error);
+                setError('Failed to load podcasts by category. Please try again later.');
             })
             .finally(() => {
                 setLoading(false);
@@ -205,7 +225,7 @@ export default function PodcastsScreen() {
                 }
             />
         </SafeAreaView>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
@@ -218,5 +238,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
 });
+
+
 
 

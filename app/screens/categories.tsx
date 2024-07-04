@@ -31,7 +31,7 @@ const CategoriesScreen: React.FC = () => {
     }, []);
 
     const handleCategoryPress = (categoryId: number) => {
-        navigation.navigate('Back', { categoryId});
+        navigation.navigate('index', { categoryId });
     };
 
     if (loading) {
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
 });
 
 export default CategoriesScreen;
+
 
 
 

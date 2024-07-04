@@ -23,7 +23,8 @@ import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer';
 import { AudioProvider, useAudio } from '@/context/AudioContext';
 import { DownloadProvider } from '@/context/DownloadContext';
-import { AuthProvider } from '@/context/AuthContext';  // Add this import
+import { AuthProvider } from '@/context/AuthContext';
+import { detectDeviceLanguage } from '@/api';
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     downloads: { focused: 'download', unfocused: 'download-outline' },
@@ -45,6 +46,10 @@ function Back() {
             return () => setIsTab(false);
         }, [setIsTab])
     );
+
+    useEffect(() => {
+        detectDeviceLanguage(); // Detect device language on app mount
+    }, []);
 
     return (
         <Tabs
