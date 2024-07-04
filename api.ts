@@ -10,6 +10,26 @@ const apiClient = axios.create({
     withCredentials: true,
 });
 
+export const login = async (email: string, password: string) => {
+    try {
+        // Request CSRF cookie
+        await apiClient.get('/sanctum/csrf-cookie');
+
+        // Send login request
+        const response = await apiClient.post('/api/login', { email, password });
+
+        // If successful, return user data
+        if (response.status === 200) {
+            return response.data.user;
+        } else {
+            throw new Error('Invalid credentials');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw error;
+    }
+};
+
 export const fetchPodcasts = async (): Promise<Podcast[]> => {
     try {
         const response = await apiClient.get<{ feeds: Podcast[] }>('/api/index'); // Adjust the response type
@@ -99,6 +119,26 @@ const sendDownloadData = async (id: number, title: string): Promise<void> => {
         console.log('Download data sent');
     } catch (error) {
         console.error('Error sending download data:', error);
+        throw error;
+    }
+};
+
+export const fetchCategories = async (): Promise<{ id: number, name: string }[]> => {
+    try {
+        const response = await apiClient.get<{ feeds: { id: number, name: string }[] }>('/api/feed-cat');
+        return response.data.feeds;
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        throw error;
+    }
+};
+
+export const fetchPodcastsByCategory = async (categoryId: number): Promise<Podcast[]> => {
+    try {
+        const response = await apiClient.get<{ feeds: Podcast[] }>(`/api/feed-cat/${categoryId}`);
+        return response.data.feeds;
+    } catch (error) {
+        console.error('Error fetching podcasts by category:', error);
         throw error;
     }
 };

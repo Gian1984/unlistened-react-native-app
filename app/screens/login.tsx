@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {RootStackParamList} from "@/types";
+import { RootStackParamList } from '@/types';
 import { StackNavigationProp } from '@react-navigation/stack';
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
-
 import { ThemedView } from '@/components/ThemedView';
+import { login } from '@/api';
+import { useAuth } from '@/context/AuthContext';
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Back'>;
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+    const { login: authLogin } = useAuth();
 
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const handleLogin = async () => {
+        if (!validateEmail(email)) {
+            Alert.alert('Invalid email', 'Please enter a valid email address');
+            return;
+        }
 
-    const handleLogin = () => {
-        // Add your login logic here
-        if (username === 'user' && password === 'password') {
-            navigation.navigate('Home');
-        } else {
-            Alert.alert('Invalid credentials', 'Please check your username and password');
+        try {
+            await login(email, password);
+            authLogin(); // Set the user as logged in
+            navigation.navigate('Back'); // Navigate to the Back screen which contains the Tabs navigator
+        } catch (error) {
+            Alert.alert('Invalid credentials', 'Please check your email and password');
         }
     };
 
+    const validateEmail = (email: string) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
 
     return (
         <ThemedView className="bg-white h-full">
@@ -32,9 +44,11 @@ const LoginScreen: React.FC = () => {
                     <Text className="text-3xl font-bold mb-6">Login</Text>
                     <TextInput
                         className="w-80 h-12 border border-gray-300 rounded px-4 mb-4"
-                        placeholder="Username"
-                        value={username}
-                        onChangeText={setUsername}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
                     />
                     <TextInput
                         className="w-80 h-12 border border-gray-300 rounded px-4 mb-6"
@@ -53,19 +67,13 @@ const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    stepContainer: {
-        gap: 8,
-        marginBottom: 8,
-    },
-    logo:{
-        width:176,
+    logo: {
+        width: 176,
         marginBottom: 10,
-    }
+    },
 });
 
 export default LoginScreen;
+
+
+

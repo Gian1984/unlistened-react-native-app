@@ -1,42 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 import { useNavigation } from '@react-navigation/native';
-import { UserIcon } from 'react-native-heroicons/outline';
-import {RootStackParamList} from "@/types";
+import { UserIcon, MagnifyingGlassIcon } from 'react-native-heroicons/outline';
+import { RootStackParamList } from '@/types';
+import Logo from '@/components/Logo';
+import { useAuth } from '@/context/AuthContext';
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Login' | 'Categories'>;
 
 const Header: React.FC = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation<NavigationProp>();
+    const { isLoggedIn, logout } = useAuth();
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
     };
 
     const handleLogin = () => {
-        // Navigate to the login screen
         navigation.navigate('Login');
         setModalVisible(false);
     };
 
     const handleSignup = () => {
-        // Navigate to the signup screen
         navigation.navigate('Sign');
         setModalVisible(false);
     };
 
     const handleLogout = () => {
-        // Implement logout functionality
+        logout();
         setModalVisible(false);
+    };
+
+    const handleSearch = () => {
+        navigation.navigate('Categories');
     };
 
     return (
         <View style={styles.container}>
             <Image source={require('@/assets/images/unlistened_transparen_logo_176.png')} style={styles.logo} />
-            <TouchableOpacity onPress={toggleModal} style={styles.userIconContainer}>
-                <UserIcon color="black" />
-            </TouchableOpacity>
+            <View style={styles.iconsContainer}>
+                <TouchableOpacity onPress={handleSearch} style={styles.iconContainer}>
+                    <MagnifyingGlassIcon color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleModal} style={styles.iconContainer}>
+                    <UserIcon color="black" />
+                </TouchableOpacity>
+            </View>
 
             <Modal
                 transparent={true}
@@ -46,15 +57,21 @@ const Header: React.FC = () => {
             >
                 <TouchableOpacity style={styles.modalOverlay} onPress={toggleModal}>
                     <View style={styles.modalContent}>
-                        <TouchableOpacity onPress={handleLogin} className="bg-indigo-700 py-3 mt-2 rounded-full w-full">
-                            <Text className="text-white text-center font-bold">Login</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={handleSignup} className="bg-indigo-700 py-3 mt-2 rounded-full w-full">
-                            <Text className="text-white text-center font-bold">Signup</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={handleLogout} className="bg-indigo-700 py-3 mt-2 rounded-full w-full">
-                            <Text className="text-white text-center font-bold">Logout</Text>
-                        </TouchableOpacity>
+                        <Logo />
+                        {!isLoggedIn ? (
+                            <>
+                                <TouchableOpacity onPress={handleLogin} className="bg-indigo-700 py-3 mt-6 rounded-full w-full">
+                                    <Text className="text-white text-center font-bold">Login</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleSignup} className="bg-indigo-700 py-3 mt-2 rounded-full w-full">
+                                    <Text className="text-white text-center font-bold">Signup</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <TouchableOpacity onPress={handleLogout} className="bg-indigo-700 py-3 mt-2 rounded-full w-full">
+                                <Text className="text-white text-center font-bold">Logout</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </TouchableOpacity>
             </Modal>
@@ -75,13 +92,17 @@ const styles = StyleSheet.create({
         height: 40,
         resizeMode: 'contain',
     },
-    userIconContainer: {
+    iconsContainer: {
+        flexDirection: 'row',
+    },
+    iconContainer: {
         width: 40,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
         backgroundColor: '#f0f0f0',
+        marginLeft: 10,
     },
     modalOverlay: {
         flex: 1,
@@ -96,9 +117,8 @@ const styles = StyleSheet.create({
         padding: 20,
         alignItems: 'center',
     },
-    modalOption: {
-        width: '100%',
-    },
 });
 
 export default Header;
+
+

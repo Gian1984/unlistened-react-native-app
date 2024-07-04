@@ -1,14 +1,14 @@
-// app/(tabs)/podcasts.tsx
 import React, { useState, useEffect } from 'react';
-import {Image, Text, TouchableOpacity, FlatList, StyleSheet, View, ActivityIndicator} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { fetchPodcasts, searchPodcasts } from '@/api';
+import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory } from '@/api';
 import { Podcast, RootStackParamList } from '@/types';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
+type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
 
 import SearchField from "@/components/SearchField";
 import Logo from "@/components/Logo";
@@ -16,11 +16,8 @@ import Header from '@/components/Header';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-
 import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
-
-
 
 export default function PodcastsScreen() {
     const [podcasts, setPodcasts] = useState<Podcast[]>([]);
@@ -29,14 +26,17 @@ export default function PodcastsScreen() {
     const [error, setError] = useState<string | null>(null);
     const [searchPerformed, setSearchPerformed] = useState(false);
     const navigation = useNavigation<NavigationProp>();
+    const route = useRoute<HomeScreenRouteProp>();
+    const categoryId = route.params?.categoryId;
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(categoryId);
+    }, [categoryId]);
 
-    const fetchData = () => {
+    const fetchData = (categoryId?: number) => {
         setLoading(true);
-        fetchPodcasts()
+        const fetchFunction = categoryId ? () => fetchPodcastsByCategory(categoryId) : fetchPodcasts;
+        fetchFunction()
             .then(data => {
                 setPodcasts(data);
                 setError(null);
@@ -110,7 +110,6 @@ export default function PodcastsScreen() {
                 </ThemedView>
             </SafeAreaView>
         );
-
     }
 
     return (
@@ -125,7 +124,7 @@ export default function PodcastsScreen() {
                     <View>
                         <ThemedView className="pt-3 pb-1">
                             {searchPerformed ? (
-                                    <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Result :</ThemedText>
+                                <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Result :</ThemedText>
                             ) : (
                                 <ThemedText className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Dive into the podcast world!</ThemedText>
                             )}
@@ -206,7 +205,7 @@ export default function PodcastsScreen() {
                 }
             />
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -219,3 +218,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
 });
+
+

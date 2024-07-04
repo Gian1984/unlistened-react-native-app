@@ -7,6 +7,7 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import EpisodesScreen from "@/app/screens/episodes";
+import CategoriesScreen from "@/app/screens/categories";
 import AboutScreen from "@/app/screens/about";
 import TermsScreen from "@/app/screens/terms";
 import PlayerScreen from "@/app/screens/player";
@@ -22,7 +23,7 @@ import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer';
 import { AudioProvider, useAudio } from '@/context/AudioContext';
 import { DownloadProvider } from '@/context/DownloadContext';
-import SignupScreen from "@/app/screens/signup";
+import { AuthProvider } from '@/context/AuthContext';  // Add this import
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     downloads: { focused: 'download', unfocused: 'download-outline' },
@@ -112,6 +113,18 @@ function Episodes() {
     return <EpisodesScreen />;
 }
 
+function Categories() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <CategoriesScreen />;
+}
+
 function Player() {
     const { setIsTab } = useAudio();
 
@@ -199,57 +212,64 @@ function Sign() {
 export default function App() {
     return (
         <Provider store={store}>
-            <AudioProvider>
-                <DownloadProvider>
-                    <View style={{ flex: 1 }}>
-                        <Stack.Navigator>
-                            <Stack.Screen
-                                name="Back"
-                                component={Back}
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen
-                                name="Downloads"
-                                component={Downloads}
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen
-                                name="Episodes"
-                                component={Episodes}
-                            />
-                            <Stack.Screen
-                                name="Player"
-                                component={Player}
-                            />
-                            <Stack.Screen
-                                name="Settings"
-                                component={Settings}
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen
-                                name="About"
-                                component={About}
-                            />
-                            <Stack.Screen
-                                name="Terms"
-                                component={Terms}
-                            />
-                            <Stack.Screen
-                                name="Sign"
-                                component={Sign}
-                            />
-                            <Stack.Screen
-                                name="Login"
-                                component={Login}
-                            />
-                        </Stack.Navigator>
-                        <MiniPlayer />
-                    </View>
-                </DownloadProvider>
-            </AudioProvider>
+            <AuthProvider>
+                <AudioProvider>
+                    <DownloadProvider>
+                        <View style={{ flex: 1 }}>
+                            <Stack.Navigator>
+                                <Stack.Screen
+                                    name="Back"
+                                    component={Back}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="Downloads"
+                                    component={Downloads}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="Episodes"
+                                    component={Episodes}
+                                />
+                                <Stack.Screen
+                                    name="Player"
+                                    component={Player}
+                                />
+                                <Stack.Screen
+                                    name="Categories"
+                                    component={Categories}
+                                />
+                                <Stack.Screen
+                                    name="Settings"
+                                    component={Settings}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="About"
+                                    component={About}
+                                />
+                                <Stack.Screen
+                                    name="Terms"
+                                    component={Terms}
+                                />
+                                <Stack.Screen
+                                    name="Sign"
+                                    component={Sign}
+                                />
+                                <Stack.Screen
+                                    name="Login"
+                                    component={Login}
+                                />
+                            </Stack.Navigator>
+                            <MiniPlayer />
+                        </View>
+                    </DownloadProvider>
+                </AudioProvider>
+            </AuthProvider>
         </Provider>
     );
 }
+
 
 
 

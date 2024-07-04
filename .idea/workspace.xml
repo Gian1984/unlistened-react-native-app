@@ -5,12 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4a873fc7-52ea-4a3d-8863-afd309bb4b41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/screens/login.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/screens/signup.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Header.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/screens/categories.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/context/AuthContext.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/api.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/bookmarks.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/bookmarks.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/downloads.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/downloads.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/favourites.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/favourites.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/settings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/screens/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/screens/login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Logo.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -79,7 +86,7 @@
       <workItem from="1718952375138" duration="499000" />
       <workItem from="1718952897641" duration="2682000" />
       <workItem from="1718988751227" duration="14309000" />
-      <workItem from="1719319934499" duration="93600000" />
+      <workItem from="1719319934499" duration="104064000" />
     </task>
     <servers />
   </component>

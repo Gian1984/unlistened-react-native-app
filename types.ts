@@ -52,7 +52,7 @@ export type IconName =
 
 
 export type RootStackParamList = {
-    Home: undefined;
+    Home: { categoryId: number };
     Downloads: undefined;
     Favourites: undefined;
     Bookmarks: undefined;
@@ -61,7 +61,8 @@ export type RootStackParamList = {
     About: undefined;
     Terms: undefined;
     Settings: undefined;
-    Back: undefined;
+    Back: { categoryId: number };
     Sign: undefined;
     Login: undefined;
+    Categories:undefined;
 };

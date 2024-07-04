@@ -6,6 +6,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'About'>;
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRightIcon, UserIcon, InformationCircleIcon, DocumentTextIcon } from 'react-native-heroicons/outline';
 import { ThemedView } from '@/components/ThemedView';
+import Header from '@/components/Header';
 import {RootStackParamList} from "@/types"; // Ensure the correct import path
 
 const SettingsScreen: React.FC = () => {
@@ -13,6 +14,7 @@ const SettingsScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header />
             <ThemedView className="flex-1 bg-white p-4">
                 <Text className="text-3xl font-bold text-gray-900 mb-6">Settings</Text>
 

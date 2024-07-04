@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import Header from '@/components/Header';
 import { ThemedView } from '@/components/ThemedView';
 import { useDownload } from '@/context/DownloadContext';
 import { useAudio } from '@/context/AudioContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Episode } from '@/types';
-import { PlayIcon } from 'react-native-heroicons/outline';
 
 const Downloads: React.FC = () => {
     const { downloadedEpisodes, downloadEpisode } = useDownload();
@@ -25,6 +25,7 @@ const Downloads: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header />
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.header}>
                     <Text className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Downloaded Episodes</Text>
