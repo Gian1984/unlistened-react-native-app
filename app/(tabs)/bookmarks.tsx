@@ -1,14 +1,34 @@
+// src/app/(tabs)/BookmarksScreen.tsx
+import React, { useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, Alert } from 'react-native';
 import Header from '@/components/Header';
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React from "react";
+import { useAuth } from '@/context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '@/types';
 
-export default function TabTwoScreen() {
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+
+const BookmarksScreen: React.FC = () => {
+    const { isLoggedIn } = useAuth();
+    const navigation = useNavigation<NavigationProp>();
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+        }
+    }, [isLoggedIn, navigation]);
+
+    if (!isLoggedIn) {
+        return null;
+    }
+
     return (
         <ParallaxScrollView
             headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -88,7 +108,7 @@ export default function TabTwoScreen() {
             </Collapsible>
         </ParallaxScrollView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     headerImage: {
@@ -102,3 +122,6 @@ const styles = StyleSheet.create({
         gap: 8,
     },
 });
+
+export default BookmarksScreen;
+

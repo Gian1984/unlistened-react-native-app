@@ -48,6 +48,17 @@ export const login = async (email: string, password: string) => {
     }
 };
 
+
+export const logout = async (): Promise<void> => {
+    try {
+        await apiClient.get('/sanctum/csrf-cookie');
+        await apiClient.post('/api/logout');
+    } catch (error) {
+        console.error('Error during logout:', error);
+        throw error;
+    }
+};
+
 export const fetchPodcasts = async (): Promise<Podcast[]> => {
     try {
         const response = await apiClient.get<{ feeds: Podcast[] }>('/api/index'); // Adjust the response type

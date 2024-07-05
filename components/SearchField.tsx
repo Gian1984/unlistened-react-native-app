@@ -20,7 +20,7 @@ const SearchField: React.FC<SearchProps> = ({ onSearch }) => {
             </TouchableOpacity>
             <TextInput
                 style={styles.input}
-                placeholder="Search podcasts"
+                placeholder="Search"
                 value={query}
                 onChangeText={setQuery}
                 onSubmitEditing={handleSearch}

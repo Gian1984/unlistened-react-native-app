@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { UserIcon, MagnifyingGlassIcon } from 'react-native-heroicons/outline';
 import { RootStackParamList } from '@/types';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
+import { logout as apiLogout } from '@/api';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login' | 'Categories'>;
 
@@ -19,7 +20,7 @@ const Header: React.FC = () => {
     };
 
     const handleLogin = () => {
-        navigation.navigate('Login');
+        navigation.navigate('Login' ,{ message: 'Welcome!' });
         setModalVisible(false);
     };
 
@@ -28,9 +29,17 @@ const Header: React.FC = () => {
         setModalVisible(false);
     };
 
-    const handleLogout = () => {
-        logout();
-        setModalVisible(false);
+    const handleLogout = async () => {
+        try {
+            await apiLogout();
+            logout(); // Update the context state
+            Alert.alert('Success', 'Successfully logged out');
+        } catch (error) {
+            console.error('Error during logout:', error);
+            Alert.alert('Error', 'Failed to log out');
+        } finally {
+            setModalVisible(false);
+        }
     };
 
     const handleSearch = () => {
@@ -116,6 +125,18 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 20,
         alignItems: 'center',
+    },
+    authButton: {
+        backgroundColor: '#4f46e5',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginVertical: 5,
+    },
+    authButtonText: {
+        color: '#fff',
+        textAlign: 'center',
+        fontWeight: 'bold',
     },
 });
 

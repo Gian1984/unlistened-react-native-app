@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, SafeAreaView, TextInput } from 'react-native';
 import { fetchCategories } from '@/api';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '@/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ThemedView } from "@/components/ThemedView";
 import Logo from "@/components/Logo";
+import {Ionicons} from "@expo/vector-icons";
 
 type CategoriesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Back'>;
 
 const CategoriesScreen: React.FC = () => {
     const [categories, setCategories] = useState<{ id: number, name: string }[]>([]);
+    const [filteredCategories, setFilteredCategories] = useState<{ id: number, name: string }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const navigation = useNavigation<CategoriesScreenNavigationProp>();
 
     useEffect(() => {
@@ -20,6 +23,7 @@ const CategoriesScreen: React.FC = () => {
             try {
                 const categoriesData = await fetchCategories();
                 setCategories(categoriesData);
+                setFilteredCategories(categoriesData); // Initialize filteredCategories with all categories
                 setLoading(false);
             } catch (err) {
                 setError('Error fetching categories');
@@ -34,24 +38,24 @@ const CategoriesScreen: React.FC = () => {
         navigation.navigate('index', { categoryId });
     };
 
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        const filtered = categories.filter(category =>
+            category.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setFilteredCategories(filtered);
+    };
+
     if (loading) {
         return (
-            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
-                <ThemedView className="py-6">
+            <ThemedView style={styles.loadingContainer}>
+                <ThemedView style={styles.logoContainer}>
                     <Logo />
                 </ThemedView>
-                <Text className="mt-4 text-3xl font-bold text-gray-900">Welcome !</Text>
-                <Text className="my-4 text-base text-center text-gray-900">We're getting the latest updates to bring you the freshest categories.</Text>
-                <ActivityIndicator size="large" color="#ec4899"/>
+                <Text style={styles.welcomeText}>Welcome!</Text>
+                <Text style={styles.loadingText}>We're getting the latest updates to bring you the freshest categories.</Text>
+                <ActivityIndicator size="large" color="#ec4899" />
             </ThemedView>
-        );
-    }
-
-    if (error) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
         );
     }
 
@@ -59,21 +63,36 @@ const CategoriesScreen: React.FC = () => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.header}>
-                    <Text className="mt-2 text-4xl font-bold tracking-tight text-start ml-0 text-gray-900">Categories</Text>
+                    <Text style={styles.headerText}>Categories</Text>
+                    <View style={styles.searchContainer}>
+                        <TouchableOpacity onPress={() => handleSearch(searchQuery)}>
+                            <Ionicons name="search" size={24} color="gray" />
+                        </TouchableOpacity>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Search categories"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            onSubmitEditing={() => handleSearch(searchQuery)}
+                        />
+                    </View>
                 </View>
-                {categories.length === 0 ? (
-                    <Text className="mt-2 text-4xl font-bold tracking-tight text-gray-900">No categories available.</Text>
+                {error && (
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorText}>{error}</Text>
+                    </View>
+                )}
+                {filteredCategories.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>No categories available.</Text>
                 ) : (
-                    categories.map((category) => (
-                        <ThemedView key={category.id} className="py-1">
-                            <View>
-                                <TouchableOpacity
-                                    className="bg-indigo-700 py-3 mt-2 rounded-full w-100"
-                                    onPress={() => handleCategoryPress(category.id)}
-                                >
-                                    <Text className="text-white text-center font-bold">{category.name}</Text>
-                                </TouchableOpacity>
-                            </View>
+                    filteredCategories.map((category) => (
+                        <ThemedView key={category.id} style={styles.categoryContainer}>
+                            <TouchableOpacity
+                                style={styles.categoryButton}
+                                onPress={() => handleCategoryPress(category.id)}
+                            >
+                                <Text style={styles.categoryButtonText}>{category.name}</Text>
+                            </TouchableOpacity>
                         </ThemedView>
                     ))
                 )}
@@ -92,25 +111,82 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         padding: 16,
     },
-    container: {
+    loadingContainer: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 16,
+        backgroundColor: '#fff',
+        padding: 4,
     },
-    header: {
-        marginBottom: 20,
+    logoContainer: {
+        paddingBottom: 24,
+    },
+    welcomeText: {
+        marginTop: 16,
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#333',
     },
     loadingText: {
         marginTop: 16,
         fontSize: 18,
+        textAlign: 'center',
+    },
+    errorContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
     },
     errorText: {
         color: 'red',
         fontSize: 18,
     },
+    header: {
+        marginBottom: 20,
+    },
+    headerText: {
+        marginTop: 16,
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        borderRadius: 25,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginVertical: 20,
+    },
+    input: {
+        flex: 1,
+        marginLeft: 10,
+    },
+    noCategoriesText: {
+        marginTop: 16,
+        fontSize: 18,
+        textAlign: 'center',
+    },
+    categoryContainer: {
+        paddingVertical: 8,
+    },
+    categoryButton: {
+        backgroundColor: '#4f46e5',
+        paddingVertical: 12,
+        borderRadius: 25,
+        width: '100%',
+        alignItems: 'center',
+    },
+    categoryButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
 });
 
 export default CategoriesScreen;
+
+
 
 
 
