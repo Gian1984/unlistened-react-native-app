@@ -66,7 +66,9 @@ const Header: React.FC = () => {
             >
                 <TouchableOpacity style={styles.modalOverlay} onPress={toggleModal}>
                     <View style={styles.modalContent}>
-                        <Logo />
+                        <View className="py-3">
+                            <Logo />
+                        </View>
                         {!isLoggedIn ? (
                             <>
                                 <TouchableOpacity onPress={handleLogin} className="bg-indigo-700 py-3 mt-6 rounded-full w-full">

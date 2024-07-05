@@ -1,102 +1,130 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
-import Header from '@/components/Header';
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { ThemedView } from '@/components/ThemedView';
+import Logo from '@/components/Logo';
+import { useAuth } from '@/context/AuthContext';
+import { fetchFavorites, removeFavorite } from '@/api';
+import { RootStackParamList } from '@/types';
+import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 
-export default function TabTwoScreen() {
-    return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-            headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-            <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Explore</ThemedText>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+
+const FavouritesScreen: React.FC = () => {
+    const { isLoggedIn } = useAuth();
+    const navigation = useNavigation<NavigationProp>();
+    const [favorites, setFavorites] = useState<{ id: number, title: string }[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+        } else {
+            const loadFavorites = async () => {
+                try {
+                    const favoritesData = await fetchFavorites();
+                    setFavorites(favoritesData);
+                } catch (err) {
+                    setError('Error fetching favorites');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadFavorites();
+        }
+    }, [isLoggedIn, navigation]);
+
+    const handleRemoveFavorite = async (id: number) => {
+        try {
+            await removeFavorite(id);
+            setFavorites((prev) => prev.filter((favorite) => favorite.id !== id));
+        } catch (error) {
+            Alert.alert('Error', 'There was an error removing the favorite. Please try again later.');
+        }
+    };
+
+    const handleNavigateToEpisodes = (id: number) => {
+        navigation.navigate('Episodes', { id });
+    };
+
+    if (!isLoggedIn) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
+                    <Logo />
+                </ThemedView>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">Sorry !</Text>
+                <Text className="my-4 text-base text-center text-gray-900">You need to be logged in to access this functionality</Text>
+                <TouchableOpacity
+                    className="bg-indigo-700 py-3 mt-2 rounded-full flex w-80"
+                    onPress={() => navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' })}
+                >
+                    <Text className="text-white text-center font-bold">Login</Text>
+                </TouchableOpacity>
             </ThemedView>
-            <ThemedText>This app includes example code to help you get started.</ThemedText>
-            <Collapsible title="File-based routing">
-                <ThemedText>
-                    This app has two screens:{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-                </ThemedText>
-                <ThemedText>
-                    The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-                    sets up the tab navigator.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/router/introduction">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Android, iOS, and web support">
-                <ThemedText>
-                    You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-                    <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-                </ThemedText>
-            </Collapsible>
-            <Collapsible title="Images">
-                <ThemedText>
-                    For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-                    different screen densities
-                </ThemedText>
-                <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-                <ExternalLink href="https://reactnative.dev/docs/images">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Custom fonts">
-                <ThemedText>
-                    Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-                    <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-                        custom fonts such as this one.
-                    </ThemedText>
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Light and dark mode components">
-                <ThemedText>
-                    This template has light and dark mode support. The{' '}
-                    <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-                    what the user's current color scheme is, and so you can adjust UI colors accordingly.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Animations">
-                <ThemedText>
-                    This template includes an example of an animated component. The{' '}
-                    <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-                    the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-                    to create a waving hand animation.
-                </ThemedText>
-                {Platform.select({
-                    ios: (
-                        <ThemedText>
-                            The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-                            component provides a parallax effect for the header image.
-                        </ThemedText>
-                    ),
-                })}
-            </Collapsible>
-        </ParallaxScrollView>
-    );
-}
+        );
+    }
 
-const styles = StyleSheet.create({
-    headerImage: {
-        color: '#808080',
-        bottom: -90,
-        left: -35,
-        position: 'absolute',
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        gap: 8,
-    },
-});
+    if (loading) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ActivityIndicator size="large" color="#ec4899" />
+                <Text className="mt-4 text-3xl font-bold text-gray-900">Loading favorites...</Text>
+            </ThemedView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedView className="flex-1 justify-center items-center bg-white p-4 py-4">
+                <Text style={{ color: 'red' }}>{error}</Text>
+            </ThemedView>
+        );
+    }
+
+    return (
+        <ScrollView className="bg-white">
+            <ThemedView className="flex-1 justify-center items-center">
+                <View className="mx-auto px-6 lg:px-8">
+                    <View className="bg-white pb-24 pt-6">
+                        <View className="mx-auto">
+                            <Text className="text-3xl font-bold tracking-tight text-gray-900">Your Favorite Feeds</Text>
+                            {favorites.length === 0 ? (
+                                <Text className="mt-6 text-lg text-center text-gray-900">
+                                    It looks like you haven't added any favorites yet. Start exploring and add some!
+                                </Text>
+                            ) : (
+                                favorites.map((favorite) => (
+                                    <View key={favorite.id} className="py-4 flex-row justify-between items-center border-b border-gray-300">
+                                        <Text className="text-lg font-semibold text-gray-900">{favorite.title}</Text>
+                                        <View className="flex-row">
+                                            <TouchableOpacity
+                                                onPress={() => handleNavigateToEpisodes(favorite.id)}
+                                                className="bg-indigo-700 py-2 px-3 rounded-full flex items-center justify-center mr-2"
+                                            >
+                                                <ArrowRightIcon className="h-5 w-5 text-white" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => handleRemoveFavorite(favorite.id)}
+                                                className="bg-red-600 py-2 px-3 rounded-full flex items-center justify-center"
+                                            >
+                                                <TrashIcon className="h-5 w-5 text-white" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                ))
+                            )}
+                        </View>
+                    </View>
+                </View>
+            </ThemedView>
+        </ScrollView>
+    );
+};
+
+export default FavouritesScreen;
+
+
+

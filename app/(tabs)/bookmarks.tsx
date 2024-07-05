@@ -1,7 +1,7 @@
 // src/app/(tabs)/BookmarksScreen.tsx
 import React, { useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform, Alert } from 'react-native';
+import {StyleSheet, Image, Platform, Alert, Text, ActivityIndicator, TouchableOpacity} from 'react-native';
 import Header from '@/components/Header';
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types';
+import Logo from "@/components/Logo";
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -26,7 +27,23 @@ const BookmarksScreen: React.FC = () => {
     }, [isLoggedIn, navigation]);
 
     if (!isLoggedIn) {
-        return null;
+        return (
+
+                <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                    <ThemedView className="py-6">
+                        <Logo />
+                    </ThemedView>
+                    <Text className="mt-4 text-3xl font-bold text-gray-900">Sorry !</Text>
+                    <Text className="my-4 text-base text-center text-gray-900">You need to be logged in to access this functionality</Text>
+                    <TouchableOpacity
+                        className="bg-indigo-700 py-3 mt-2 rounded-full flex w-80"
+                        onPress={() => navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' })}
+                    >
+                        <Text className="text-white text-center font-bold">Login</Text>
+                    </TouchableOpacity>
+                </ThemedView>
+
+        );
     }
 
     return (
@@ -35,7 +52,7 @@ const BookmarksScreen: React.FC = () => {
             headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
             <ThemedView style={styles.titleContainer}>
                 <Header />
-                <ThemedText type="title">Explore</ThemedText>
+                <ThemedText type="title">Book</ThemedText>
             </ThemedView>
             <ThemedText>This app includes example code to help you get started.</ThemedText>
             <Collapsible title="File-based routing">
