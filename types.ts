@@ -19,6 +19,7 @@ export interface Episode {
     feedImage: string;
     datePublished: number;
     feedId: number;
+    feed_id:number;
 }
 
 export interface FeedInfo {

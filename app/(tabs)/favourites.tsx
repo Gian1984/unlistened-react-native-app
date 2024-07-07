@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    SafeAreaView,
+    ActivityIndicator,
+    ScrollView,
+    Alert,
+    StyleSheet
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ThemedView } from '@/components/ThemedView';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
+import Header from '@/components/Header';
 import { fetchFavorites, removeFavorite } from '@/api';
 import { RootStackParamList } from '@/types';
 import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
+
 const FavouritesScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
     const navigation = useNavigation<NavigationProp>();
-    const [favorites, setFavorites] = useState<{ id: number, title: string }[]>([]);
+    const [favorites, setFavorites] = useState<{ id: number, title: string, feed_id: number }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,18 +47,24 @@ const FavouritesScreen: React.FC = () => {
         }
     }, [isLoggedIn, navigation]);
 
-    const handleRemoveFavorite = async (id: number) => {
+    const handleRemoveFavorite = async (feed_id: number) => {
         try {
-            await removeFavorite(id);
-            setFavorites((prev) => prev.filter((favorite) => favorite.id !== id));
+            await removeFavorite(feed_id);
+            setFavorites((prev) => prev.filter((favorite) => favorite.feed_id !== feed_id));
         } catch (error) {
             Alert.alert('Error', 'There was an error removing the favorite. Please try again later.');
         }
     };
 
-    const handleNavigateToEpisodes = (id: number) => {
-        navigation.navigate('Episodes', { id });
+
+    const handleNavigateToEpisodes = (feed_id: number) => {
+        const numericFeedId = Number(feed_id); // Convert the feed_id to a number
+        if (isNaN(numericFeedId)) {
+            return;
+        }
+        navigation.navigate('Episodes', { id: numericFeedId });
     };
+
 
     if (!isLoggedIn) {
         return (
@@ -85,46 +102,81 @@ const FavouritesScreen: React.FC = () => {
     }
 
     return (
-        <ScrollView className="bg-white">
-            <ThemedView className="flex-1 justify-center items-center">
-                <View className="mx-auto px-6 lg:px-8">
-                    <View className="bg-white pb-24 pt-6">
-                        <View className="mx-auto">
-                            <Text className="text-3xl font-bold tracking-tight text-gray-900">Your Favorite Feeds</Text>
-                            {favorites.length === 0 ? (
-                                <Text className="mt-6 text-lg text-center text-gray-900">
-                                    It looks like you haven't added any favorites yet. Start exploring and add some!
-                                </Text>
-                            ) : (
-                                favorites.map((favorite) => (
-                                    <View key={favorite.id} className="py-4 flex-row justify-between items-center border-b border-gray-300">
-                                        <Text className="text-lg font-semibold text-gray-900">{favorite.title}</Text>
-                                        <View className="flex-row">
-                                            <TouchableOpacity
-                                                onPress={() => handleNavigateToEpisodes(favorite.id)}
-                                                className="bg-indigo-700 py-2 px-3 rounded-full flex items-center justify-center mr-2"
-                                            >
-                                                <ArrowRightIcon className="h-5 w-5 text-white" />
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                onPress={() => handleRemoveFavorite(favorite.id)}
-                                                className="bg-red-600 py-2 px-3 rounded-full flex items-center justify-center"
-                                            >
-                                                <TrashIcon className="h-5 w-5 text-white" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                ))
-                            )}
-                        </View>
-                    </View>
+        <SafeAreaView style={styles.safeArea}>
+            <Header />
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.header}>
+                    <Text className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Your Favorite Feeds</Text>
                 </View>
-            </ThemedView>
-        </ScrollView>
+                {favorites.length === 0 ? (
+                    <Text style={styles.noEpisodesText}>No downloaded episodes.</Text>
+                ) : (
+                    favorites.map((favorite) => (
+                        <ThemedView key={favorite.id} className="py-6 border-b border-gray-300">
+                            <View>
+                                <Text style={styles.episodeTitle}>{favorite.title}</Text>
+                                <View className="flex-row justify-between pt-4">
+                                    <TouchableOpacity
+                                        onPress={() => handleNavigateToEpisodes(favorite.feed_id)}
+                                        className="bg-indigo-700 py-2 px-3 rounded-full flex items-center justify-end mr-2 w-3/4"
+                                    >
+                                        <ArrowRightIcon className="h-5 w-5" color="white" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => handleRemoveFavorite(favorite.feed_id)}
+                                        className="bg-red-600 py-2 px-3 rounded-full flex items-center justify-center"
+                                    >
+                                        <TrashIcon className="h-5 w-5" color="white" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </ThemedView>
+                    ))
+                )}
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff', // Ensure the status bar area has a white background
+    },
+    container: {
+        padding: 20,
+    },
+    header: {
+        marginBottom: 20,
+    },
+    noEpisodesText: {
+        fontSize: 16,
+    },
+    episodeTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    episodeDate: {
+        marginBottom: 10,
+        fontSize: 14,
+        color: 'gray',
+    },
+    playButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#ec4899',
+        padding: 10,
+        borderRadius: 5,
+    },
+    playButtonText: {
+        marginLeft: 5,
+        color: 'white',
+        fontSize: 14,
+    },
+});
+
 export default FavouritesScreen;
+
 
 
 

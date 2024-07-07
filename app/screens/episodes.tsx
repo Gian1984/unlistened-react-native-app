@@ -1,4 +1,3 @@
-// src/screens/EpisodesScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
@@ -198,6 +197,3 @@ const styles = StyleSheet.create({
 });
 
 export default EpisodesScreen;
-
-
-
