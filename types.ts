@@ -59,7 +59,7 @@ export type RootStackParamList = {
     Favourites: undefined;
     Bookmarks: undefined;
     Episodes: { id: number };
-    Player: { episode: Episode };
+    Player: { episode_id: number };
     About: undefined;
     Terms: undefined;
     Settings: undefined;

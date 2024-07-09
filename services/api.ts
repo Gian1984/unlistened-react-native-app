@@ -148,7 +148,7 @@ export const fetchFavorites = async (): Promise<{ id: number; title: string; fee
 };
 
 // Function to fetch bookmarks
-export const fetchBookmarks = async (): Promise<{ id: number; title: string; feed_id: number }[]> => {
+export const fetchBookmarks = async (): Promise<{ id: number; title: string; episode_id: number }[]> => {
     try {
 
         // Make the GET request to fetch bookmarks
@@ -206,6 +206,16 @@ const sendDownloadData = async (id: number, title: string): Promise<void> => {
         });
     } catch (error) {
         console.error('Error sending download data:', error);
+        throw error;
+    }
+};
+
+export const fetchEpisode = async (episodeId: number): Promise<Episode> => {
+    try {
+        const response = await apiClient.get(`/api/search_episode/${episodeId}`);
+        return response.data.episode;
+    } catch (error) {
+        console.error('Error fetching episode:', error);
         throw error;
     }
 };

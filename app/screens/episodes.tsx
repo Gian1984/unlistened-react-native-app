@@ -58,7 +58,7 @@ const EpisodesScreen: React.FC = () => {
 
     const handlePlayEpisode = (episode: Episode) => {
         setSelectedEpisode(episode);
-        navigation.navigate('Player', { episode });
+        navigation.navigate('Player', { episode_id: episode.id });
     };
 
     const handleDownloadEpisode = async (episode: Episode) => {
