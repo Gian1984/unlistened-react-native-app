@@ -1,7 +1,16 @@
 // src/app/(tabs)/BookmarksScreen.tsx
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {StyleSheet, Image, Platform, Alert, Text, ActivityIndicator, TouchableOpacity} from 'react-native';
+import {
+    StyleSheet,
+    Image,
+    Platform,
+    Alert,
+    Text,
+    ActivityIndicator,
+    TouchableOpacity,
+    SafeAreaView, ScrollView, View
+} from 'react-native';
 import Header from '@/components/Header';
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -13,16 +22,33 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types';
 import Logo from "@/components/Logo";
+import {fetchBookmarks, fetchFavorites} from "@/services/api";
+import {ArrowRightIcon, TrashIcon} from "react-native-heroicons/outline";
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 const BookmarksScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
     const navigation = useNavigation<NavigationProp>();
+    const [bookmarks, setBookmarks] = useState<{ id: number, title: string, feed_id: number }[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!isLoggedIn) {
             navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+        } else {
+            const loadBookmarks = async () => {
+                try {
+                    const bookmarksData = await fetchBookmarks();
+                    setBookmarks(bookmarksData);
+                } catch (err) {
+                    setError('Error fetching favorites');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadBookmarks();
         }
     }, [isLoggedIn, navigation]);
 
@@ -47,96 +73,74 @@ const BookmarksScreen: React.FC = () => {
     }
 
     return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-            headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-            <ThemedView style={styles.titleContainer}>
-                <Header />
-                <ThemedText type="title">Book</ThemedText>
-            </ThemedView>
-            <ThemedText>This app includes example code to help you get started.</ThemedText>
-            <Collapsible title="File-based routing">
-                <ThemedText>
-                    This app has two screens:{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-                </ThemedText>
-                <ThemedText>
-                    The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-                    sets up the tab navigator.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/router/introduction">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Android, iOS, and web support">
-                <ThemedText>
-                    You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-                    <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-                </ThemedText>
-            </Collapsible>
-            <Collapsible title="Images">
-                <ThemedText>
-                    For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-                    different screen densities
-                </ThemedText>
-                <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-                <ExternalLink href="https://reactnative.dev/docs/images">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Custom fonts">
-                <ThemedText>
-                    Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-                    <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-                        custom fonts such as this one.
-                    </ThemedText>
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Light and dark mode components">
-                <ThemedText>
-                    This template has light and dark mode support. The{' '}
-                    <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-                    what the user's current color scheme is, and so you can adjust UI colors accordingly.
-                </ThemedText>
-                <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
-            </Collapsible>
-            <Collapsible title="Animations">
-                <ThemedText>
-                    This template includes an example of an animated component. The{' '}
-                    <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-                    the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-                    to create a waving hand animation.
-                </ThemedText>
-                {Platform.select({
-                    ios: (
-                        <ThemedText>
-                            The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-                            component provides a parallax effect for the header image.
-                        </ThemedText>
-                    ),
-                })}
-            </Collapsible>
-        </ParallaxScrollView>
+        <SafeAreaView style={styles.safeArea}>
+            <Header />
+            <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.header}>
+                    <Text className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Your Favorite Feeds</Text>
+                </View>
+                {bookmarks.length === 0 ? (
+                    <Text style={styles.noEpisodesText}>No downloaded episodes.</Text>
+                ) : (
+                    bookmarks.map((bookmark) => (
+                        <ThemedView key={bookmark.id} className="py-6 border-b border-gray-300">
+                            <View>
+                                <Text style={styles.episodeTitle}>{bookmark.title}</Text>
+                                <View className="flex-row justify-between pt-4">
+                                    <TouchableOpacity
+                                        className="bg-indigo-700 py-2 px-3 rounded-full flex items-center justify-end mr-2 w-3/4"
+                                    >
+                                        <ArrowRightIcon className="h-5 w-5" color="white" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        className="bg-red-600 py-2 px-3 rounded-full flex items-center justify-center"
+                                    >
+                                        <TrashIcon className="h-5 w-5" color="white" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </ThemedView>
+                    ))
+                )}
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    headerImage: {
-        color: '#808080',
-        bottom: -90,
-        left: -35,
-        position: 'absolute',
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff', // Ensure the status bar area has a white background
     },
-    titleContainer: {
+    container: {
+        padding: 20,
+    },
+    header: {
+        marginBottom: 20,
+    },
+    noEpisodesText: {
+        fontSize: 16,
+    },
+    episodeTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    episodeDate: {
+        marginBottom: 10,
+        fontSize: 14,
+        color: 'gray',
+    },
+    playButton: {
         flexDirection: 'row',
-        gap: 8,
+        alignItems: 'center',
+        backgroundColor: '#ec4899',
+        padding: 10,
+        borderRadius: 5,
+    },
+    playButtonText: {
+        marginLeft: 5,
+        color: 'white',
+        fontSize: 14,
     },
 });
 

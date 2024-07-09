@@ -24,7 +24,7 @@ import MiniPlayer from '@/components/MiniPlayer';
 import { AudioProvider, useAudio } from '@/context/AudioContext';
 import { DownloadProvider } from '@/context/DownloadContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { detectDeviceLanguage } from '@/api';
+import { detectDeviceLanguage } from '@/services/api';
 
 const iconNames: Record<string, { focused: ComponentProps<typeof MaterialCommunityIcons>['name']; unfocused: ComponentProps<typeof MaterialCommunityIcons>['name'] }> = {
     downloads: { focused: 'download', unfocused: 'download-outline' },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, SafeAreaView, TextInput } from 'react-native';
-import { fetchCategories } from '@/api';
+import { fetchCategories } from '@/services/api';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '@/types';
 import { StackNavigationProp } from '@react-navigation/stack';

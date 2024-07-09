@@ -1,7 +1,7 @@
 // src/context/DownloadContext.tsx
 import React, { createContext, useContext, useState } from 'react';
 import { Episode } from '@/types';
-import { downloadPodcast } from '@/api';
+import { downloadPodcast } from '@/services/api';
 
 interface DownloadContextProps {
     downloadedEpisodes: Episode[];

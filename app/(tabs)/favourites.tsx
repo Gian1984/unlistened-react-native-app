@@ -15,7 +15,7 @@ import { ThemedView } from '@/components/ThemedView';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
 import Header from '@/components/Header';
-import { fetchFavorites, removeFavorite } from '@/api';
+import { fetchFavorites, removeFavorite } from '@/services/api';
 import { RootStackParamList } from '@/types';
 import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 

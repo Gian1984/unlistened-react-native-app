@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ThemedView } from '@/components/ThemedView';
-import { login } from '@/api';
+import { login } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Back'>;
@@ -24,8 +24,9 @@ const LoginScreen: React.FC = () => {
         }
 
         try {
-            const { user, csrfToken } = await login(email, password);
-            authLogin(user, csrfToken);
+            const deviceName = 'ReactNativeApp'; // You can dynamically get this value if needed
+            const { user } = await login(email, password, deviceName);
+            authLogin();
             navigation.navigate('Back'); // Navigate to the Back screen which contains the Tabs navigator
         } catch (error) {
             Alert.alert('Invalid credentials', 'Please check your email and password');

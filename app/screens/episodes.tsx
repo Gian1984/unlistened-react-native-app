@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { fetchEpisodes, fetchFeedInfo, addBookmark, downloadPodcast } from '@/api';
+import { fetchEpisodes, fetchFeedInfo, addBookmark, downloadPodcast } from '@/services/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
 import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';

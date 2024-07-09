@@ -6,7 +6,7 @@ import { UserIcon, MagnifyingGlassIcon } from 'react-native-heroicons/outline';
 import { RootStackParamList } from '@/types';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
-import { logout as apiLogout } from '@/api';
+import { logout as apiLogout } from '@/services/api';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login' | 'Categories'>;
 

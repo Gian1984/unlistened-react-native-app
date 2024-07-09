@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory } from '@/api';
+import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory } from '@/services/api';
 import { Podcast, RootStackParamList } from '@/types';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;

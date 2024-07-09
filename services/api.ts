@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import * as Localization from 'expo-localization';
 import { getInfoAsync, makeDirectoryAsync, downloadAsync, cacheDirectory } from 'expo-file-system';
-import { Podcast, Episode, FeedInfo } from './types';
+import { Podcast, Episode, FeedInfo } from '@/types';
 
 const baseUrl = 'http://localhost';
 
@@ -29,39 +29,16 @@ apiClient.interceptors.request.use(async (config) => {
     return config;
 });
 
-const ensureCsrfToken = async () => {
-    try {
-        const response = await apiClient.get('/sanctum/csrf-cookie');
-        const csrfToken = response.headers['x-xsrf-token'] || response.headers['x-csrf-token'];
-        if (csrfToken) {
-            await SecureStore.setItemAsync('csrfToken', csrfToken);
-        } else {
-            const cookies = response.headers['set-cookie'] || [];
-            const xsrfCookie = cookies.find(cookie => cookie.startsWith('XSRF-TOKEN='));
-            if (xsrfCookie) {
-                const token = xsrfCookie.split(';')[0].split('=')[1];
-                await SecureStore.setItemAsync('csrfToken', token);
-            } else {
-                console.log('No CSRF token found in headers or cookies.');
-            }
-        }
-    } catch (error) {
-        console.error('Error ensuring CSRF token:', error);
-    }
-};
 
-export const login = async (email: string, password: string) => {
+export const login = async (email: string, password: string, deviceName: string) => {
     try {
-        await ensureCsrfToken();
-        const response = await apiClient.post('/api/login-mobile', { email, password });
+        const response = await apiClient.post('/api/login-mobile', { email, password, device_name: deviceName });
 
         if (response.status === 200) {
             const sessionToken = response.data.token;
-            const userId = response.data.user.id; // Get user ID from response
 
-            if (sessionToken && userId) {
+            if (sessionToken) {
                 await SecureStore.setItemAsync('sessionToken', sessionToken);
-                await SecureStore.setItemAsync('userId', userId.toString()); // Store user ID as a string
             }
             return response.data.user;
         } else {
@@ -73,9 +50,10 @@ export const login = async (email: string, password: string) => {
     }
 };
 
+
 export const logout = async (): Promise<void> => {
     try {
-        await ensureCsrfToken();
+
         await apiClient.post('/api/logout');
         await SecureStore.deleteItemAsync('csrfToken');
         await SecureStore.deleteItemAsync('sessionToken');
@@ -90,7 +68,6 @@ const getPreferredLanguage = () => Localization.locale;
 export const detectDeviceLanguage = async (): Promise<void> => {
     try {
         const language = getPreferredLanguage();
-        await ensureCsrfToken();
         await apiClient.post('/api/detect-language', { language });
     } catch (error) {
         console.error('Error updating device language:', error);
@@ -120,7 +97,6 @@ export const searchPodcasts = async (title: string): Promise<Podcast[]> => {
 
 export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
     try {
-        await ensureCsrfToken();
         const response = await apiClient.get(`/api/feed_info/${feedId}`);
         return response.data.feed;
     } catch (error) {
@@ -131,7 +107,6 @@ export const fetchFeedInfo = async (feedId: number): Promise<FeedInfo> => {
 
 export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
     try {
-        await ensureCsrfToken();
         const response = await apiClient.get(`/api/search_feed/${feedId}`);
         return response.data.items;
     } catch (error) {
@@ -142,7 +117,6 @@ export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
 
 export const addFavourite = async (feedId: number, feedTitle: string): Promise<void> => {
     try {
-        await ensureCsrfToken();
         await apiClient.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
     } catch (error) {
         console.error('Error adding favorite:', error);
@@ -152,7 +126,6 @@ export const addFavourite = async (feedId: number, feedTitle: string): Promise<v
 
 export const addBookmark = async (episodeId: number, episodeTitle: string): Promise<void> => {
     try {
-        await ensureCsrfToken();
         await apiClient.post('api/add-bookmark', { episode_id: episodeId, title: episodeTitle });
     } catch (error) {
         console.error('Error adding bookmark:', error);
@@ -162,11 +135,7 @@ export const addBookmark = async (episodeId: number, episodeTitle: string): Prom
 
 export const fetchFavorites = async (): Promise<{ id: number; title: string; feed_id:number }[]> => {
     try {
-        const userId = await SecureStore.getItemAsync('userId');
-        if (!userId) {
-            throw new Error('User ID not found.');
-        }
-        const response = await apiClient.post('/api/favorites-mobile', { user_id: userId });
+        const response = await apiClient.get('/api/user-favorites');
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -178,9 +147,30 @@ export const fetchFavorites = async (): Promise<{ id: number; title: string; fee
     }
 };
 
+// Function to fetch bookmarks
+export const fetchBookmarks = async (): Promise<{ id: number; title: string; feed_id: number }[]> => {
+    try {
+
+        // Make the GET request to fetch bookmarks
+        const response = await apiClient.get('/api/user-bookmarks');
+
+        // Return the response data
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+
+            console.error('Error fetching bookmarks');
+        } else {
+
+            console.error('Unexpected error fetching bookmarks:', error);
+        }
+        throw error;
+    }
+};
+
+
 export const removeFavorite = async (id: number): Promise<void> => {
     try {
-        await ensureCsrfToken();
         await apiClient.post('/api/delete-favorite', { feed_id: id });
     } catch (error) {
         console.error('Error removing favorite:', error);
@@ -210,7 +200,6 @@ export const downloadPodcast = async (title: string, url: string, id: number): P
 
 const sendDownloadData = async (id: number, title: string): Promise<void> => {
     try {
-        await ensureCsrfToken();
         await apiClient.post('/api/add_download_click', {
             episode_id: id,
             episode_title: title,
