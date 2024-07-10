@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     View,
     Text,
@@ -9,7 +9,7 @@ import {
     Alert,
     StyleSheet
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ThemedView } from '@/components/ThemedView';
 import Logo from '@/components/Logo';
@@ -21,7 +21,6 @@ import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
-
 const FavouritesScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
     const navigation = useNavigation<NavigationProp>();
@@ -29,23 +28,27 @@ const FavouritesScreen: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!isLoggedIn) {
-            navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
-        } else {
-            const loadFavorites = async () => {
-                try {
-                    const favoritesData = await fetchFavorites();
-                    setFavorites(favoritesData);
-                } catch (err) {
-                    setError('Error fetching favorites');
-                } finally {
-                    setLoading(false);
-                }
-            };
-            loadFavorites();
+    const loadFavorites = async () => {
+        try {
+            const favoritesData = await fetchFavorites();
+            setFavorites(favoritesData);
+        } catch (err) {
+            setError('Error fetching favorites');
+        } finally {
+            setLoading(false);
         }
-    }, [isLoggedIn, navigation]);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            if (isLoggedIn) {
+                setLoading(true);
+                loadFavorites();
+            } else {
+                navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+            }
+        }, [isLoggedIn, navigation])
+    );
 
     const handleRemoveFavorite = async (feed_id: number) => {
         try {
@@ -56,7 +59,6 @@ const FavouritesScreen: React.FC = () => {
         }
     };
 
-
     const handleNavigateToEpisodes = (feed_id: number) => {
         const numericFeedId = Number(feed_id); // Convert the feed_id to a number
         if (isNaN(numericFeedId)) {
@@ -64,7 +66,6 @@ const FavouritesScreen: React.FC = () => {
         }
         navigation.navigate('Episodes', { id: numericFeedId });
     };
-
 
     if (!isLoggedIn) {
         return (
@@ -176,6 +177,7 @@ const styles = StyleSheet.create({
 });
 
 export default FavouritesScreen;
+
 
 
 

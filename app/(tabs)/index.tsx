@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory } from '@/services/api';
+import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory, addFavourite, fetchFavorites } from '@/services/api';
 import { Podcast, RootStackParamList } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
 type HomeScreenRouteProp = RouteProp<RootStackParamList, 'index'>;
@@ -20,11 +21,14 @@ import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
 
 export default function PodcastsScreen() {
+    const { isLoggedIn } = useAuth();
     const [podcasts, setPodcasts] = useState<Podcast[]>([]);
+    const [favorites, setFavorites] = useState<{ id: number; title: string; feed_id: number }[]>([]);
     const [visibleCount, setVisibleCount] = useState(5);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchPerformed, setSearchPerformed] = useState(false);
+
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<HomeScreenRouteProp>();
     const categoryId = route.params?.categoryId;
@@ -36,6 +40,12 @@ export default function PodcastsScreen() {
             fetchData();
         }
     }, [categoryId]);
+
+    useEffect(() => {
+        fetchFavorites()
+            .then(favData => setFavorites(favData))
+            .catch(err => console.error('Error fetching favorites:', err));
+    }, []);
 
     const fetchData = () => {
         setLoading(true);
@@ -115,6 +125,22 @@ export default function PodcastsScreen() {
 
     const navigateToEpisodes = (id: number) => {
         navigation.navigate('Episodes', { id });
+    };
+
+    const handleAddFavourite = async (feedId: number, feedTitle: string) => {
+        if (!isLoggedIn) {
+            Alert.alert('Login Required', 'You need to be logged in to add favorites.');
+            return;
+        }
+
+        try {
+            const updatedFavorites = await addFavourite(feedId, feedTitle);
+            setFavorites(updatedFavorites); // Update the state with the new list of favorites
+            Alert.alert('Success', 'Podcast added to favorites');
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+            Alert.alert('Error', 'Failed to add podcast to favorites');
+        }
     };
 
     if (loading) {
@@ -198,9 +224,11 @@ export default function PodcastsScreen() {
                             <ThemedView className="flex border-b">
                                 <ThemedView className="flex-row py-6">
                                     <TouchableOpacity
-                                        className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"
+                                        className={`font-bold py-2 px-4 mx-1 rounded-full ${isLoggedIn ? 'bg-pink-500 hover:bg-indigo-700 text-white' : 'bg-gray-100 text-gray-400'}`}
+                                        onPress={() => isLoggedIn && handleAddFavourite(item.id, item.title)}
+                                        disabled={!isLoggedIn}
                                     >
-                                        <StarIcon className="h-5 w-5" color="white" />
+                                        <StarIcon className="h-5 w-5" color={isLoggedIn ? 'white' : 'gray'} />
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full"

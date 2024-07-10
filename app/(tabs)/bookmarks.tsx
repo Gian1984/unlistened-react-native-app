@@ -1,5 +1,5 @@
 // src/app/(tabs)/BookmarksScreen.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     StyleSheet,
     Text,
@@ -10,10 +10,10 @@ import {
     View,
     Alert
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/types';
-import {fetchBookmarks, removeFavorite} from '@/services/api';
+import { fetchBookmarks, removeBookmark } from '@/services/api';
 import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 import { useAuth } from '@/context/AuthContext';
 import { ThemedView } from '@/components/ThemedView';
@@ -29,28 +29,36 @@ const BookmarksScreen: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!isLoggedIn) {
-            navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
-        } else {
-            const loadBookmarks = async () => {
-                try {
-                    const bookmarksData = await fetchBookmarks();
-                    setBookmarks(bookmarksData);
-                } catch (err) {
-                    setError('Error fetching bookmarks');
-                } finally {
-                    setLoading(false);
-                }
-            };
-            loadBookmarks();
+    const loadBookmarks = async () => {
+        try {
+            const bookmarksData = await fetchBookmarks();
+            setBookmarks(bookmarksData);
+        } catch (err) {
+            setError('Error fetching bookmarks');
+        } finally {
+            setLoading(false);
         }
-    }, [isLoggedIn, navigation]);
-
-    const handleRemoveBookmark = async (episode_id: number) => {
-
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            if (isLoggedIn) {
+                setLoading(true);
+                loadBookmarks();
+            } else {
+                navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+            }
+        }, [isLoggedIn, navigation])
+    );
+
+    const handleRemoveBookmark = async (episode_id: number) => {
+        try {
+            await removeBookmark(episode_id);
+            setBookmarks((prev) => prev.filter((bookmark) => bookmark.episode_id !== episode_id));
+        } catch (error) {
+            Alert.alert('Error', 'There was an error removing the bookmark. Please try again later.');
+        }
+    };
 
     const handleNavigateToEpisode = (episode_id: number) => {
         const numericFeedId = Number(episode_id); // Convert the feed_id to a number
@@ -78,6 +86,23 @@ const BookmarksScreen: React.FC = () => {
         );
     }
 
+    if (loading) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ActivityIndicator size="large" color="#ec4899" />
+                <Text className="mt-4 text-3xl font-bold text-gray-900">Loading bookmarks...</Text>
+            </ThemedView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedView className="flex-1 justify-center items-center bg-white p-4 py-4">
+                <Text style={{ color: 'red' }}>{error}</Text>
+            </ThemedView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <Header />
@@ -85,11 +110,7 @@ const BookmarksScreen: React.FC = () => {
                 <View style={styles.header}>
                     <Text className="mt-2 text-4xl font-bold tracking-tight text-gray-900">Your Bookmarks</Text>
                 </View>
-                {loading ? (
-                    <ActivityIndicator size="large" color="#0000ff" />
-                ) : error ? (
-                    <Text style={styles.errorText}>{error}</Text>
-                ) : bookmarks.length === 0 ? (
+                {bookmarks.length === 0 ? (
                     <Text style={styles.noEpisodesText}>No bookmarks found.</Text>
                 ) : (
                     bookmarks.map((bookmark) => (
@@ -144,6 +165,7 @@ const styles = StyleSheet.create({
 });
 
 export default BookmarksScreen;
+
 
 
 

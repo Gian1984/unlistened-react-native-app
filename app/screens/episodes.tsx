@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import {View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet, Alert} from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { fetchEpisodes, fetchFeedInfo, addBookmark, downloadPodcast } from '@/services/api';
+import { fetchEpisodes, fetchFeedInfo, addBookmark, addFavourite, downloadPodcast } from '@/services/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
 import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDownload } from '@/context/DownloadContext';
+import { useAuth } from '@/context/AuthContext';
 
 type EpisodesScreenRouteProp = RouteProp<RootStackParamList, 'Episodes'>;
 type PlayerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Player'>;
@@ -16,6 +17,7 @@ const EpisodesScreen: React.FC = () => {
     const navigation = useNavigation<PlayerScreenNavigationProp>();
     const { id } = route.params;
     const { downloadedEpisodes, downloadEpisode } = useDownload();
+    const { isLoggedIn } = useAuth();
     const [feedInfo, setFeedInfo] = useState<FeedInfo | null>(null);
     const [episodes, setEpisodes] = useState<Episode[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -67,7 +69,25 @@ const EpisodesScreen: React.FC = () => {
             await downloadEpisode(episode);
             setDownloadingEpisodes((prev) => prev.filter((id) => id !== episode.id));
         } catch (error) {
-            console.error('Error downloading episode:', error);
+            Alert.alert('Error', 'Error downloading episode. Please try later');
+        }
+    };
+
+    const handleAddFavourite = async (feedId: number, feedTitle: string) => {
+        try {
+            await addFavourite(feedId, feedTitle);
+            Alert.alert('Success', 'Favourite added to favorites');
+        } catch (error) {
+            Alert.alert('Error', 'Error adding to favorites. Please try later');
+        }
+    };
+
+    const handleAddBookmark = async (episodeId: number, episodeTitle: string) => {
+        try {
+            await addBookmark(episodeId, episodeTitle);
+            Alert.alert('Success', 'Bookmark added to bookmarks');
+        } catch (error) {
+            Alert.alert('Error', 'Error adding to bookmarks. Please try later');
         }
     };
 
@@ -112,8 +132,12 @@ const EpisodesScreen: React.FC = () => {
                                             className="aspect-square w-full rounded-2xl bg-gray-50"
                                         />
                                     </ThemedView>
-                                    <TouchableOpacity className="bg-indigo-700 py-3 mt-5 rounded-full flex">
-                                        <Text className="text-white text-center font-bold">Add to favourite</Text>
+                                    <TouchableOpacity
+                                        className={`py-3 mt-5 rounded-full ${isLoggedIn ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-900'}`}
+                                        onPress={() => isLoggedIn && handleAddFavourite(id, feedInfo.title)}
+                                        disabled={!isLoggedIn}
+                                    >
+                                        <Text className={`text-center font-bold ${isLoggedIn ? 'text-white' : 'text-gray-900'}`}>{isLoggedIn ? 'Add to favourite' : 'Login to add favourite'}</Text>
                                     </TouchableOpacity>
                                 </ThemedView>
 
@@ -133,9 +157,12 @@ const EpisodesScreen: React.FC = () => {
                                                                           className="bg-pink-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mx-1 rounded-full flex">
                                                             <PlayIcon className="h-5 w-5" color="white"/>
                                                         </TouchableOpacity>
-                                                        <TouchableOpacity onPress={() => addBookmark(episode.id, episode.title)}
-                                                                          className="bg-pink-500 text-white font-bold py-2 px-4 mx-1 rounded-full">
-                                                            <BookmarkIcon className="h-5 w-5" color="white"/>
+                                                        <TouchableOpacity
+                                                            onPress={() => isLoggedIn && handleAddBookmark(episode.id, episode.title)}
+                                                            className={`font-bold py-2 px-4 mx-1 rounded-full ${isLoggedIn ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-400'}`}
+                                                            disabled={!isLoggedIn}
+                                                        >
+                                                            <BookmarkIcon className="h-5 w-5" color={isLoggedIn ? 'white' : 'gray'} />
                                                         </TouchableOpacity>
                                                         <TouchableOpacity onPress={() => handleDownloadEpisode(episode)}
                                                                           className="bg-pink-500 text-white font-bold py-2 px-4 mx-1 rounded-full">

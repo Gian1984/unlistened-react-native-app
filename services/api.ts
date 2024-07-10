@@ -115,9 +115,11 @@ export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
     }
 };
 
-export const addFavourite = async (feedId: number, feedTitle: string): Promise<void> => {
+
+export const addFavourite = async (feedId: number, feedTitle: string): Promise<{ id: number; title: string; feed_id: number }[]> => {
     try {
         await apiClient.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
+        return await fetchFavorites();
     } catch (error) {
         console.error('Error adding favorite:', error);
         throw error;
@@ -150,18 +152,12 @@ export const fetchFavorites = async (): Promise<{ id: number; title: string; fee
 // Function to fetch bookmarks
 export const fetchBookmarks = async (): Promise<{ id: number; title: string; episode_id: number }[]> => {
     try {
-
-        // Make the GET request to fetch bookmarks
         const response = await apiClient.get('/api/user-bookmarks');
-
-        // Return the response data
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
-
             console.error('Error fetching bookmarks');
         } else {
-
             console.error('Unexpected error fetching bookmarks:', error);
         }
         throw error;
@@ -172,6 +168,15 @@ export const fetchBookmarks = async (): Promise<{ id: number; title: string; epi
 export const removeFavorite = async (id: number): Promise<void> => {
     try {
         await apiClient.post('/api/delete-favorite', { feed_id: id });
+    } catch (error) {
+        console.error('Error removing favorite:', error);
+        throw error;
+    }
+};
+
+export const removeBookmark = async (id: number): Promise<void> => {
+    try {
+        await apiClient.post('/api/delete-bookmark', { episode_id: id });
     } catch (error) {
         console.error('Error removing favorite:', error);
         throw error;
