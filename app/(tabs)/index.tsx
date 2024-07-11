@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View, ActivityIndicator, Alert } from 'react-native';
+import { Image, Text, TouchableOpacity, FlatList, StyleSheet, View, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,19 +8,18 @@ import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory, addFavourite, f
 import { Podcast, RootStackParamList } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
-type HomeScreenRouteProp = RouteProp<RootStackParamList, 'index'>;
-
 import SearchField from "@/components/SearchField";
-import Logo from "@/components/Logo";
+import Loading from '@/components/Loading';
 import Header from '@/components/Header';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
 import { ArrowRightIcon } from "react-native-heroicons/solid";
 import { StarIcon } from "react-native-heroicons/outline";
 
-export default function PodcastsScreen() {
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Episodes'>;
+type HomeScreenRouteProp = RouteProp<RootStackParamList, 'index'>;
+
+const PodcastsScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
     const [podcasts, setPodcasts] = useState<Podcast[]>([]);
     const [favorites, setFavorites] = useState<{ id: number; title: string; feed_id: number }[]>([]);
@@ -33,63 +32,28 @@ export default function PodcastsScreen() {
     const route = useRoute<HomeScreenRouteProp>();
     const categoryId = route.params?.categoryId;
 
+    const fetchData = async () => {
+        setLoading(true);
+        const data = categoryId ? await fetchPodcastsByCategory(categoryId) : await fetchPodcasts();
+        setPodcasts(data);
+        setError(null);
+        setLoading(false);
+        setSearchPerformed(false);
+    };
+
     useEffect(() => {
-        if (categoryId) {
-            fetchCategoryData(categoryId);
-        } else {
-            fetchData();
-        }
+        fetchData();
     }, [categoryId]);
 
     useEffect(() => {
         fetchFavorites()
-            .then(favData => setFavorites(favData))
+            .then(setFavorites)
             .catch(err => console.error('Error fetching favorites:', err));
     }, []);
 
-    const fetchData = () => {
-        setLoading(true);
-        fetchPodcasts()
-            .then(data => {
-                setPodcasts(data);
-                setError(null);
-            })
-            .catch(error => {
-                console.error('Error fetching podcasts:', error);
-                setError('Failed to load podcasts. Please try again later.');
-            })
-            .finally(() => {
-                setLoading(false);
-                setSearchPerformed(false);
-            });
-    };
+    const loadMore = () => setVisibleCount(prev => Math.min(prev + 5, podcasts.length));
 
-    const fetchCategoryData = (categoryId: number) => {
-        setLoading(true);
-        fetchPodcastsByCategory(categoryId)
-            .then(data => {
-                setPodcasts(data);
-                setError(null);
-            })
-            .catch(error => {
-                console.error('Error fetching podcasts by category:', error);
-                setError('Failed to load podcasts by category. Please try again later.');
-            })
-            .finally(() => {
-                setLoading(false);
-                setSearchPerformed(false);
-            });
-    };
-
-    const loadMore = () => {
-        const increment = 5;
-        setVisibleCount(Math.min(visibleCount + increment, podcasts.length));
-    };
-
-    const stripHtmlTags = (str: string): string => {
-        if (!str) return '';
-        return str.replace(/<[^>]*>/g, '');
-    };
+    const stripHtmlTags = (str: string): string => str.replace(/<[^>]*>/g, '');
 
     const getReadableDate = (unixTimestamp: number): string => {
         const date = new Date(unixTimestamp * 1000);
@@ -102,29 +66,19 @@ export default function PodcastsScreen() {
         });
     };
 
-    const handleSearch = (query: string) => {
+    const handleSearch = async (query: string) => {
         setLoading(true);
         setSearchPerformed(true);
-        searchPodcasts(query)
-            .then(data => {
-                setPodcasts(data);
-                setError(null);
-            })
-            .catch(error => {
-                console.error('Error searching podcasts:', error);
-                setError('Failed to search podcasts. Please try again later.');
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
-    const handleBackToAll = () => {
-        fetchData();
-    };
-
-    const navigateToEpisodes = (id: number) => {
-        navigation.navigate('Episodes', { id });
+        try {
+            const data = await searchPodcasts(query);
+            setPodcasts(data);
+            setError(null);
+        } catch (error) {
+            console.error('Error searching podcasts:', error);
+            setError('Failed to search podcasts. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAddFavourite = async (feedId: number, feedTitle: string) => {
@@ -135,7 +89,7 @@ export default function PodcastsScreen() {
 
         try {
             const updatedFavorites = await addFavourite(feedId, feedTitle);
-            setFavorites(updatedFavorites); // Update the state with the new list of favorites
+            setFavorites(updatedFavorites);
             Alert.alert('Success', 'Podcast added to favorites');
         } catch (error) {
             console.error('Error adding favorite:', error);
@@ -143,19 +97,17 @@ export default function PodcastsScreen() {
         }
     };
 
+    const navigateToEpisodes = (id: number) => {
+        navigation.navigate('Episodes', { id });
+    };
+
     if (loading) {
         return (
             <SafeAreaView style={styles.safeArea}>
-                <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
-                    <ThemedView className="py-6">
-                        <Logo />
-                    </ThemedView>
-                    <Text className="mt-4 text-3xl font-bold text-gray-900">Welcome !</Text>
-                    <Text className="my-4 text-base text-center text-gray-900">We're getting the latest updates to bring you the freshest episodes.</Text>
-                    <ActivityIndicator size="large" color="#ec4899"/>
-                </ThemedView>
+                <Header />
+                <Text><Loading message="We're getting the latest updates to bring you the freshest episodes." />;</Text>
             </SafeAreaView>
-        );
+        )
     }
 
     return (
@@ -178,7 +130,7 @@ export default function PodcastsScreen() {
                         <ThemedView className="pt-3 pb-12">
                             <SearchField onSearch={handleSearch} />
                             {searchPerformed ? (
-                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={handleBackToAll}>
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={fetchData}>
                                     <Text className="text-white text-center font-bold">Back to All Podcasts</Text>
                                 </TouchableOpacity>
                             ) : (
@@ -211,7 +163,7 @@ export default function PodcastsScreen() {
                                 Categories:
                             </Text>
                             <View>
-                                {item.categories && typeof item.categories === 'object' && Object.keys(item.categories).length > 0 ? (
+                                {item.categories && Object.keys(item.categories).length > 0 ? (
                                     Object.entries(item.categories).map(([key, value]) => (
                                         <Text key={key} className="text-gray-600">
                                             {value}
@@ -225,8 +177,13 @@ export default function PodcastsScreen() {
                                 <ThemedView className="flex-row py-6">
                                     <TouchableOpacity
                                         className={`font-bold py-2 px-4 mx-1 rounded-full ${isLoggedIn ? 'bg-pink-500 hover:bg-indigo-700 text-white' : 'bg-gray-100 text-gray-400'}`}
-                                        onPress={() => isLoggedIn && handleAddFavourite(item.id, item.title)}
-                                        disabled={!isLoggedIn}
+                                        onPress={() => {
+                                            if (isLoggedIn) {
+                                                handleAddFavourite(item.id, item.title);
+                                            } else {
+                                                Alert.alert('Login Required', 'You need to be logged in to add favorites.');
+                                            }
+                                        }}
                                     >
                                         <StarIcon className="h-5 w-5" color={isLoggedIn ? 'white' : 'gray'} />
                                     </TouchableOpacity>
@@ -253,19 +210,21 @@ export default function PodcastsScreen() {
                 }
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#ffffff', // Ensure the status bar area has a white background
+        backgroundColor: '#ffffff',
     },
     flatListContent: {
         paddingVertical: 8,
         paddingHorizontal: 30,
     },
 });
+
+export default PodcastsScreen;
 
 
 

@@ -1,4 +1,3 @@
-// src/components/MiniPlayer.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -16,7 +15,7 @@ const MiniPlayer: React.FC = () => {
     }
 
     const openPlayer = () => {
-        navigation.navigate('Player', { episode });
+        navigation.navigate('Player', { episode_id: episode.id });
     };
 
     const getReadableTime = (millis: number) => {
@@ -127,6 +126,8 @@ const styles = StyleSheet.create({
 });
 
 export default MiniPlayer;
+
+
 
 
 

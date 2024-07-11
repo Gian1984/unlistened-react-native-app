@@ -1,4 +1,3 @@
-// src/context/AudioContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Audio } from 'expo-av';
 import { Episode } from '@/types';
@@ -78,6 +77,8 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             setSound(null);
             setEpisodeState(null);
             setIsPlaying(false);
+            setPosition(0);
+            setDuration(0);
             setMiniPlayerVisible(false); // Hide MiniPlayer when stopped
         }
     };
@@ -89,7 +90,20 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
 
     return (
-        <AudioContext.Provider value={{ isPlaying, episode, position, duration, togglePlayPause, setEpisode, stop, isMiniPlayerVisible, setMiniPlayerVisible, seekTo, isTab, setIsTab }}>
+        <AudioContext.Provider value={{
+            isPlaying,
+            episode,
+            position,
+            duration,
+            togglePlayPause,
+            setEpisode,
+            stop,
+            isMiniPlayerVisible,
+            setMiniPlayerVisible,
+            seekTo,
+            isTab,
+            setIsTab
+        }}>
             {children}
         </AudioContext.Provider>
     );

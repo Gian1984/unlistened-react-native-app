@@ -1,7 +1,5 @@
-// src/app/(screens)/PlayerScreen.tsx
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList, Episode } from '@/types';
 import { ThemedView } from '@/components/ThemedView';
@@ -16,12 +14,14 @@ const PlayerScreen: React.FC = () => {
 
     const { setEpisode, episode: currentEpisode } = useAudio();
     const [loading, setLoading] = useState<boolean>(true);
+    const [feedInfo, setFeedInfo] = useState<Episode | null>(null);
 
     useEffect(() => {
         const loadEpisode = async () => {
             try {
                 const episodeData = await fetchEpisode(episode_id);
                 await setEpisode(episodeData);
+                setFeedInfo(episodeData); // Set feed info based on episode data
             } catch (error) {
                 console.error('Error fetching episode:', error);
             } finally {
@@ -46,17 +46,7 @@ const PlayerScreen: React.FC = () => {
             <ThemedView className="bg-white h-full">
                 <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
                     <ActivityIndicator size="large" color="#ec4899" />
-                    <Text>Loading...</Text>
-                </ThemedView>
-            </ThemedView>
-        );
-    }
-
-    if (!currentEpisode) {
-        return (
-            <ThemedView className="bg-white h-full">
-                <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
-                    <Text>Error loading episode.</Text>
+                    <Text className="my-4 text-base text-center text-gray-900">Loading...</Text>
                 </ThemedView>
             </ThemedView>
         );
@@ -66,17 +56,37 @@ const PlayerScreen: React.FC = () => {
         <ThemedView className="bg-white h-full">
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
-                    <Text className="text-3xl font-bold text-gray-900" numberOfLines={3}>{currentEpisode.title}</Text>
-                    <ThemedView className="aspect-square w-full my-6">
-                        <Image
-                            source={{ uri: currentEpisode.feedImage }}
-                            className="aspect-square w-full rounded-2xl bg-gray-50"
-                            onLoad={() => setLoading(false)}
-                        />
-                    </ThemedView>
-                    <View style={styles.descriptionContainer}>
-                        <Text className="text-sm leading-6 text-gray-600">{stripHtmlTags(currentEpisode.description)}</Text>
-                    </View>
+                    {currentEpisode ? (
+                        <>
+                            <Text className="text-3xl font-bold text-gray-900" numberOfLines={3}>{currentEpisode.title}</Text>
+                            <ThemedView className="aspect-square w-full my-6">
+                                <Image
+                                    source={{ uri: currentEpisode.feedImage }}
+                                    className="aspect-square w-full rounded-2xl bg-gray-50"
+                                    onLoad={() => setLoading(false)}
+                                />
+                            </ThemedView>
+                            <View style={styles.descriptionContainer}>
+                                <Text className="text-sm leading-6 text-gray-600">{stripHtmlTags(currentEpisode.description)}</Text>
+                            </View>
+                        </>
+                    ) : (
+                        feedInfo && (
+                            <>
+                                <Text className="text-3xl font-bold text-gray-900" numberOfLines={3}>{feedInfo.title}</Text>
+                                <ThemedView className="aspect-square w-full my-6">
+                                    <Image
+                                        source={{ uri: feedInfo.feedImage }}
+                                        className="aspect-square w-full rounded-2xl bg-gray-50"
+                                        onLoad={() => setLoading(false)}
+                                    />
+                                </ThemedView>
+                                <View style={styles.descriptionContainer}>
+                                    <Text className="text-sm leading-6 text-gray-600">{stripHtmlTags(feedInfo.description)}</Text>
+                                </View>
+                            </>
+                        )
+                    )}
                 </ThemedView>
             </ScrollView>
         </ThemedView>
@@ -84,6 +94,10 @@ const PlayerScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
     scrollViewContent: {
         flexGrow: 1,
         justifyContent: 'center',
@@ -92,11 +106,15 @@ const styles = StyleSheet.create({
     },
     descriptionContainer: {
         marginTop: 20,
-        marginBottom:100,
+        marginBottom: 100,
     },
 });
 
 export default PlayerScreen;
+
+
+
+
 
 
 

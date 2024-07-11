@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet, Alert} from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
+import Loading from '@/components/Loading';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { fetchEpisodes, fetchFeedInfo, addBookmark, addFavourite, downloadPodcast } from '@/services/api';
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
-import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon } from 'react-native-heroicons/outline';
+import {CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon, StarIcon} from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDownload } from '@/context/DownloadContext';
 import { useAuth } from '@/context/AuthContext';
@@ -93,14 +95,10 @@ const EpisodesScreen: React.FC = () => {
 
     if (loading) {
         return (
-            <ThemedView className="bg-white h-full">
-                <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
-                    <ActivityIndicator size="large" color="#ec4899" />
-                    <Text className="mt-4 text-3xl font-bold text-gray-900">Hang tight!</Text>
-                    <Text className="mt-6 text-base text-center text-gray-900">We're getting the latest updates to bring you the freshest episodes.</Text>
-                </ThemedView>
-            </ThemedView>
-        );
+            <SafeAreaView style={styles.safeArea}>
+                <Text><Loading message="We're getting the latest updates to bring you the freshest episodes." />;</Text>
+            </SafeAreaView>
+        )
     }
 
     if (error) {
@@ -134,8 +132,13 @@ const EpisodesScreen: React.FC = () => {
                                     </ThemedView>
                                     <TouchableOpacity
                                         className={`py-3 mt-5 rounded-full ${isLoggedIn ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-900'}`}
-                                        onPress={() => isLoggedIn && handleAddFavourite(id, feedInfo.title)}
-                                        disabled={!isLoggedIn}
+                                        onPress={() => {
+                                            if (isLoggedIn) {
+                                                handleAddFavourite(id, feedInfo.title)
+                                            } else {
+                                                Alert.alert('Login Required', 'You need to be logged in to add favorites.');
+                                            }
+                                        }}
                                     >
                                         <Text className={`text-center font-bold ${isLoggedIn ? 'text-white' : 'text-gray-900'}`}>{isLoggedIn ? 'Add to favourite' : 'Login to add favourite'}</Text>
                                     </TouchableOpacity>
@@ -158,9 +161,14 @@ const EpisodesScreen: React.FC = () => {
                                                             <PlayIcon className="h-5 w-5" color="white"/>
                                                         </TouchableOpacity>
                                                         <TouchableOpacity
-                                                            onPress={() => isLoggedIn && handleAddBookmark(episode.id, episode.title)}
-                                                            className={`font-bold py-2 px-4 mx-1 rounded-full ${isLoggedIn ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-400'}`}
-                                                            disabled={!isLoggedIn}
+                                                            className={`font-bold py-2 px-4 mx-1 rounded-full ${isLoggedIn ? 'bg-pink-500 hover:bg-indigo-700 text-white' : 'bg-gray-100 text-gray-400'}`}
+                                                            onPress={() => {
+                                                                if (isLoggedIn) {
+                                                                    handleAddBookmark(episode.id, episode.title)
+                                                                } else {
+                                                                    Alert.alert('Login Required', 'You need to be logged in to add favorites.');
+                                                                }
+                                                            }}
                                                         >
                                                             <BookmarkIcon className="h-5 w-5" color={isLoggedIn ? 'white' : 'gray'} />
                                                         </TouchableOpacity>
@@ -203,6 +211,10 @@ const stripHtmlTags = (str: string): string => {
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
     headerImage: {
         color: '#808080',
         bottom: -90,
