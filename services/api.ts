@@ -50,6 +50,26 @@ export const login = async (email: string, password: string, deviceName: string)
     }
 };
 
+export const register = async (username: string, email: string, password: string): Promise<void> => {
+    try {
+        await apiClient.get('/sanctum/csrf-cookie');
+        await apiClient.post('/api/register', {
+            name: username,
+            email,
+            password,
+        });
+    } catch (error: any) { // Update the type to `any` to avoid TS18046
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data.message || 'Registration failed');
+        } else {
+            throw new Error('Unexpected error during registration');
+        }
+    }
+};
+
+
+
+
 
 export const logout = async (): Promise<void> => {
     try {

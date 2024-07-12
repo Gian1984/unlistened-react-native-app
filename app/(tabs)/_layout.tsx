@@ -13,6 +13,7 @@ import TermsScreen from "@/app/screens/terms";
 import PlayerScreen from "@/app/screens/player";
 import LoginScreen from "@/app/screens/login";
 import ResetPasswordScreen from "@/app/screens/reset";
+import RegisterScreen from "@/app/screens/register";
 import SignScreen from "@/app/screens/signup";
 import DownloadsScreen from "@/app/(tabs)/downloads";
 import { RootStackParamList } from '@/types';
@@ -227,6 +228,19 @@ function ResetPassword() {
     return <ResetPasswordScreen />;
 }
 
+
+function Register() {
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <RegisterScreen />;
+}
+
 export default function App() {
     return (
         <Provider store={store}>
@@ -282,6 +296,12 @@ export default function App() {
                                     name="ResetPassword"
                                     component={ResetPassword}
                                 />
+                                <Stack.Screen
+                                    name="Register"
+                                    component={Register}
+                                    options={{ headerShown: true }}
+                                />
+
                             </Stack.Navigator>
                             <MiniPlayer />
                         </View>

@@ -25,7 +25,7 @@ const Header: React.FC = () => {
     };
 
     const handleSignup = () => {
-        navigation.navigate('Sign');
+        navigation.navigate('Register');
         setModalVisible(false);
     };
 

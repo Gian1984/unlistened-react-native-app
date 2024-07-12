@@ -61,11 +61,12 @@ export type RootStackParamList = {
     Episodes: { id: number };
     Player: { episode_id: number };
     About: undefined;
-    Terms: undefined;
+    Terms: undefined; // Ensure Terms is correctly defined
     Settings: undefined;
     Back: undefined;
     Sign: undefined;
     Login: { message?: string };
     Categories: undefined;
     ResetPassword: undefined;
+    Register: undefined;
 };
