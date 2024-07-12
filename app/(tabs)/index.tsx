@@ -31,20 +31,27 @@ const PodcastsScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<HomeScreenRouteProp>();
     const categoryId = route.params?.categoryId;
+    const [currentCategoryId, setCurrentCategoryId] = useState<number | undefined>(categoryId);
 
-    const fetchData = async () => {
+    const fetchData = async (categoryId?: number) => {
         setLoading(true);
-        const data = categoryId ? await fetchPodcastsByCategory(categoryId) : await fetchPodcasts();
-        setPodcasts(data);
-        setError(null);
-        setLoading(false);
-        setSearchPerformed(false);
+        try {
+            const data = categoryId ? await fetchPodcastsByCategory(categoryId) : await fetchPodcasts();
+            setPodcasts(data);
+            setError(null);
+        } catch (error) {
+            console.error('Error fetching podcasts:', error);
+            setError('Failed to fetch podcasts. Please try again later.');
+        } finally {
+            setLoading(false);
+            setSearchPerformed(false);
+        }
     };
 
     useEffect(() => {
-        fetchData();
+        setCurrentCategoryId(categoryId);
+        fetchData(categoryId);
     }, [categoryId]);
-
 
     const loadMore = () => setVisibleCount(prev => Math.min(prev + 5, podcasts.length));
 
@@ -96,6 +103,11 @@ const PodcastsScreen: React.FC = () => {
         navigation.navigate('Episodes', { id });
     };
 
+    const handleRefresh = () => {
+        setCurrentCategoryId(undefined);
+        fetchData();
+    };
+
     if (loading) {
         return (
             <SafeAreaView style={styles.safeArea}>
@@ -125,11 +137,11 @@ const PodcastsScreen: React.FC = () => {
                         <ThemedView className="pt-3 pb-12">
                             <SearchField onSearch={handleSearch} />
                             {searchPerformed ? (
-                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={fetchData}>
-                                    <Text className="text-white text-center font-bold">Back to All Podcasts</Text>
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={handleRefresh}>
+                                    <Text className="text-white text-center font-bold">Back to all podcasts</Text>
                                 </TouchableOpacity>
                             ) : (
-                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={fetchData}>
+                                <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full flex" onPress={handleRefresh}>
                                     <Text className="text-white text-center font-bold">Refresh list</Text>
                                 </TouchableOpacity>
                             )}
