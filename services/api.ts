@@ -60,7 +60,7 @@ export const register = async (username: string, email: string, password: string
         });
     } catch (error: any) { // Update the type to `any` to avoid TS18046
         if (axios.isAxiosError(error)) {
-            throw new Error(error.response?.data.message || 'Registration failed');
+            throw new Error(error.response?.data.password || error.response?.data.email || 'Registration failed');
         } else {
             throw new Error('Unexpected error during registration');
         }
@@ -222,7 +222,8 @@ export const downloadPodcast = async (title: string, url: string, id: number): P
     }
 };
 
-const sendDownloadData = async (id: number, title: string): Promise<void> => {
+
+export const sendDownloadData = async (id: number, title: string): Promise<void> => {
     try {
         await apiClient.post('/api/add_download_click', {
             episode_id: id,
@@ -230,6 +231,18 @@ const sendDownloadData = async (id: number, title: string): Promise<void> => {
         });
     } catch (error: any) {
         console.error('Error sending download data:', error);
+        throw error;
+    }
+};
+
+export const sendPlayData = async (episodeId: number, episodeTitle: string): Promise<void> => {
+    try {
+        await apiClient.post('/api/add_play_click', {
+            episode_id: episodeId,
+            episode_title: episodeTitle,
+        });
+    } catch (error: any) {
+        console.error('Error sending play data:', error);
         throw error;
     }
 };

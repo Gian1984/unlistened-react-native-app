@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet, Alert} from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import Loading from '@/components/Loading';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { fetchEpisodes, fetchFeedInfo, addBookmark, addFavourite, downloadPodcast } from '@/services/api';
+import { fetchEpisodes, fetchFeedInfo, addBookmark, addFavourite, downloadPodcast, sendDownloadData } from '@/services/api'; // Ensure sendDownloadData is imported
 import { RootStackParamList, Episode, FeedInfo } from '@/types';
-import {CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon, StarIcon} from 'react-native-heroicons/outline';
+import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon, StarIcon } from 'react-native-heroicons/outline';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDownload } from '@/context/DownloadContext';
 import { useAuth } from '@/context/AuthContext';
@@ -69,6 +69,7 @@ const EpisodesScreen: React.FC = () => {
         setDownloadingEpisodes((prev) => [...prev, episode.id]);
         try {
             await downloadEpisode(episode);
+            await sendDownloadData(episode.id, episode.title); // Call sendDownloadData after downloading the episode
             setDownloadingEpisodes((prev) => prev.filter((id) => id !== episode.id));
         } catch (error) {
             Alert.alert('Error', 'Error downloading episode. Please try later');

@@ -1,4 +1,3 @@
-// src/app/(tabs)/BookmarksScreen.tsx
 import React, { useCallback, useState } from 'react';
 import {
     StyleSheet,
@@ -20,7 +19,7 @@ import { ThemedView } from '@/components/ThemedView';
 import Logo from '@/components/Logo';
 import Header from '@/components/Header';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Player'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'| 'index'>;
 
 const BookmarksScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
@@ -46,7 +45,21 @@ const BookmarksScreen: React.FC = () => {
                 setLoading(true);
                 loadBookmarks();
             } else {
-                navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+                Alert.alert(
+                    'Login Required',
+                    'You need to be logged in to access this functionality.',
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => navigation.navigate('index', { categoryId: undefined }),
+                            style: 'cancel'
+                        },
+                        {
+                            text: 'Login',
+                            onPress: () => navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' })
+                        }
+                    ]
+                );
             }
         }, [isLoggedIn, navigation])
     );
@@ -165,6 +178,7 @@ const styles = StyleSheet.create({
 });
 
 export default BookmarksScreen;
+
 
 
 

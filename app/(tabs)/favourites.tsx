@@ -19,7 +19,7 @@ import { fetchFavorites, removeFavorite } from '@/services/api';
 import { RootStackParamList } from '@/types';
 import { ArrowRightIcon, TrashIcon } from 'react-native-heroicons/outline';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Login'| 'index'>;
 
 const FavouritesScreen: React.FC = () => {
     const { isLoggedIn } = useAuth();
@@ -45,7 +45,21 @@ const FavouritesScreen: React.FC = () => {
                 setLoading(true);
                 loadFavorites();
             } else {
-                navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' });
+                Alert.alert(
+                    'Login Required',
+                    'You need to be logged in to access this functionality.',
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => navigation.navigate('index', { categoryId: undefined }),
+                            style: 'cancel'
+                        },
+                        {
+                            text: 'Login',
+                            onPress: () => navigation.navigate('Login', { message: 'You need to be logged in to access this functionality.' })
+                        }
+                    ]
+                );
             }
         }, [isLoggedIn, navigation])
     );
@@ -177,6 +191,8 @@ const styles = StyleSheet.create({
 });
 
 export default FavouritesScreen;
+
+
 
 
 

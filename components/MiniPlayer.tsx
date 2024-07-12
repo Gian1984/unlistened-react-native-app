@@ -5,6 +5,7 @@ import { useAudio } from '@/context/AudioContext';
 import { PlayIcon, PauseIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/types';
+import { sendPlayData } from '@/services/api'; // Ensure sendPlayData is imported
 
 const MiniPlayer: React.FC = () => {
     const { isPlaying, episode, togglePlayPause, stop, position, duration, seekTo, isTab } = useAudio();
@@ -16,6 +17,13 @@ const MiniPlayer: React.FC = () => {
 
     const openPlayer = () => {
         navigation.navigate('Player', { episode_id: episode.id });
+    };
+
+    const handlePlayPause = async () => {
+        if (!isPlaying) {
+            await sendPlayData(episode.id, episode.title);
+        }
+        togglePlayPause();
     };
 
     const getReadableTime = (millis: number) => {
@@ -50,7 +58,7 @@ const MiniPlayer: React.FC = () => {
                         <Text style={styles.timeText}>{getReadableTime(duration - position)}</Text>
                     </View>
                 </View>
-                <TouchableOpacity onPress={togglePlayPause} style={styles.button}>
+                <TouchableOpacity onPress={handlePlayPause} style={styles.button}>
                     {isPlaying ? (
                         <PauseIcon className="h-3 w-3" color="white" />
                     ) : (

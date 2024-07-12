@@ -31,7 +31,7 @@ const RegisterScreen: React.FC = () => {
                 setErrorsRegister(null);
                 setEmail('');
                 setPassword('');
-            }, 5000);
+            }, 10000);
         }
     };
 
