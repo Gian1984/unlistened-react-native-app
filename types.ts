@@ -67,4 +67,5 @@ export type RootStackParamList = {
     Sign: undefined;
     Login: { message?: string };
     Categories: undefined;
+    ResetPassword: undefined;
 };

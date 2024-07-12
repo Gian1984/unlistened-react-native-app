@@ -53,7 +53,6 @@ export const login = async (email: string, password: string, deviceName: string)
 
 export const logout = async (): Promise<void> => {
     try {
-
         await apiClient.post('/api/logout');
         await SecureStore.deleteItemAsync('csrfToken');
         await SecureStore.deleteItemAsync('sessionToken');
@@ -120,7 +119,7 @@ export const addFavourite = async (feedId: number, feedTitle: string): Promise<{
     try {
         await apiClient.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
         return await fetchFavorites();
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error adding favorite:', error);
         throw error;
     }
@@ -129,7 +128,7 @@ export const addFavourite = async (feedId: number, feedTitle: string): Promise<{
 export const addBookmark = async (episodeId: number, episodeTitle: string): Promise<void> => {
     try {
         await apiClient.post('api/add-bookmark', { episode_id: episodeId, title: episodeTitle });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error adding bookmark:', error);
         throw error;
     }
@@ -139,9 +138,9 @@ export const fetchFavorites = async (): Promise<{ id: number; title: string; fee
     try {
         const response = await apiClient.get('/api/user-favorites');
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (axios.isAxiosError(error)) {
-            console.error('Error fetching favorites:');
+            console.error('Error fetching favorites:', error.response?.data?.message || error.message);
         } else {
             console.error('Unexpected error fetching favorites:', error);
         }
@@ -154,9 +153,9 @@ export const fetchBookmarks = async (): Promise<{ id: number; title: string; epi
     try {
         const response = await apiClient.get('/api/user-bookmarks');
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (axios.isAxiosError(error)) {
-            console.error('Error fetching bookmarks');
+            console.error('Error fetching bookmarks:', error.response?.data?.message || error.message);
         } else {
             console.error('Unexpected error fetching bookmarks:', error);
         }
@@ -168,7 +167,7 @@ export const fetchBookmarks = async (): Promise<{ id: number; title: string; epi
 export const removeFavorite = async (id: number): Promise<void> => {
     try {
         await apiClient.post('/api/delete-favorite', { feed_id: id });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error removing favorite:', error);
         throw error;
     }
@@ -177,8 +176,8 @@ export const removeFavorite = async (id: number): Promise<void> => {
 export const removeBookmark = async (id: number): Promise<void> => {
     try {
         await apiClient.post('/api/delete-bookmark', { episode_id: id });
-    } catch (error) {
-        console.error('Error removing favorite:', error);
+    } catch (error: any) {
+        console.error('Error removing bookmark:', error);
         throw error;
     }
 };
@@ -197,7 +196,7 @@ export const downloadPodcast = async (title: string, url: string, id: number): P
         const { uri } = await downloadAsync(url, fileUri);
 
         return uri;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error downloading episode:', error);
         throw error;
     }
@@ -209,7 +208,7 @@ const sendDownloadData = async (id: number, title: string): Promise<void> => {
             episode_id: id,
             episode_title: title,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error sending download data:', error);
         throw error;
     }
@@ -219,7 +218,7 @@ export const fetchEpisode = async (episodeId: number): Promise<Episode> => {
     try {
         const response = await apiClient.get(`/api/search_episode/${episodeId}`);
         return response.data.episode;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching episode:', error);
         throw error;
     }
@@ -229,7 +228,7 @@ export const fetchCategories = async (): Promise<{ id: number, name: string }[]>
     try {
         const response = await apiClient.get<{ feeds: { id: number, name: string }[] }>('/api/feed-cat');
         return response.data.feeds;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching categories:', error);
         throw error;
     }
@@ -239,17 +238,27 @@ export const fetchPodcastsByCategory = async (categoryId: number): Promise<Podca
     try {
         const response = await apiClient.get<{ feeds: Podcast[] }>(`/api/search-feeds-by-cat/${categoryId}`);
         return response.data.feeds;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching podcasts by category:', error);
         throw error;
     }
 };
 
-export const playEpisode = (episode: any) => {
-    // Your play logic here
+export const resetPassword = async (email: string): Promise<string> => {
+    try {
+        await apiClient.get('/sanctum/csrf-cookie');
+        const response = await apiClient.post('/api/forgot-password', { email });
+        return response.data.message;
+    } catch (error: any) {
+        console.error('Error sending reset password email:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || 'Failed to send reset password email');
+    }
 };
 
+
 export default apiClient;
+
+
 
 
 

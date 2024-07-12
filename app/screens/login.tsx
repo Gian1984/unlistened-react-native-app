@@ -7,8 +7,9 @@ import { ThemedView } from '@/components/ThemedView';
 import { login } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Back'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Back' | 'ResetPassword'>;
 type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
+
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const { login: authLogin } = useAuth();
@@ -38,6 +39,10 @@ const LoginScreen: React.FC = () => {
         return re.test(email);
     };
 
+    const handleResetPassword = () => {
+        navigation.navigate('ResetPassword'); // Navigate to the ResetPassword screen
+    };
+
     return (
         <ThemedView className="bg-white h-full">
             <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
@@ -63,6 +68,9 @@ const LoginScreen: React.FC = () => {
                     <TouchableOpacity className="bg-indigo-700 py-3 mt-2 rounded-full w-80" onPress={handleLogin}>
                         <Text className="text-white text-center font-bold">Login</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity className="mt-4" onPress={handleResetPassword}>
+                        <Text className="text-indigo-700 text-center font-bold">Reset Password</Text>
+                    </TouchableOpacity>
                 </View>
             </ThemedView>
         </ThemedView>
@@ -77,6 +85,8 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+
+
 
 
 
