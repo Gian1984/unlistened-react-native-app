@@ -1,11 +1,11 @@
-// src/context/DownloadContext.tsx
 import React, { createContext, useContext, useState } from 'react';
 import { Episode } from '@/types';
-import { downloadPodcast } from '@/services/api';
+import { downloadPodcast, deleteDownloadedPodcast } from '@/services/api';
 
 interface DownloadContextProps {
     downloadedEpisodes: Episode[];
     downloadEpisode: (episode: Episode) => Promise<void>;
+    removeDownloadedEpisode: (episodeId: number) => void; // Add this line
 }
 
 const DownloadContext = createContext<DownloadContextProps | undefined>(undefined);
@@ -23,8 +23,12 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     };
 
+    const removeDownloadedEpisode = (episodeId: number) => {
+        setDownloadedEpisodes((prev) => prev.filter((episode) => episode.id !== episodeId));
+    };
+
     return (
-        <DownloadContext.Provider value={{ downloadedEpisodes, downloadEpisode }}>
+        <DownloadContext.Provider value={{ downloadedEpisodes, downloadEpisode, removeDownloadedEpisode }}>
             {children}
         </DownloadContext.Provider>
     );
@@ -37,6 +41,7 @@ export const useDownload = () => {
     }
     return context;
 };
+
 
 
 

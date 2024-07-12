@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory, addFavourite, fetchFavorites } from '@/services/api';
+import { fetchPodcasts, searchPodcasts, fetchPodcastsByCategory, addFavourite } from '@/services/api';
 import { Podcast, RootStackParamList } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 
@@ -45,11 +45,6 @@ const PodcastsScreen: React.FC = () => {
         fetchData();
     }, [categoryId]);
 
-    useEffect(() => {
-        fetchFavorites()
-            .then(setFavorites)
-            .catch(err => console.error('Error fetching favorites:', err));
-    }, []);
 
     const loadMore = () => setVisibleCount(prev => Math.min(prev + 5, podcasts.length));
 

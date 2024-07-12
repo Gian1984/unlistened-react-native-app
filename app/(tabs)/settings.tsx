@@ -20,7 +20,7 @@ const SettingsScreen: React.FC = () => {
 
                 <TouchableOpacity
                     className="flex-row items-center bg-gray-100 p-4 mb-2 rounded-lg"
-                    //onPress={() => navigation.navigate('Profile')}
+                    onPress={() => navigation.navigate('Profile')}
                 >
                     <UserIcon className="h-6 w-6" color="#4f46e5"/>
                     <Text className="flex-1 ml-4 text-indigo-600 text-lg">Profile</Text>

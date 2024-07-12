@@ -20,6 +20,7 @@ import { RootStackParamList } from '@/types';
 import { ComponentProps } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SettingsScreen from "@/app/(tabs)/settings";
+import ProfileScreen from "@/app/screens/profile"; // Add this import
 import { Provider } from 'react-redux';
 import store from '@/store/store';
 import MiniPlayer from '@/components/MiniPlayer';
@@ -241,6 +242,18 @@ function Register() {
     return <RegisterScreen />;
 }
 
+function Profile() { // Add the Profile function
+    const { setIsTab } = useAudio();
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setIsTab(false);
+        }, [setIsTab])
+    );
+
+    return <ProfileScreen />;
+}
+
 export default function App() {
     return (
         <Provider store={store}>
@@ -301,7 +314,11 @@ export default function App() {
                                     component={Register}
                                     options={{ headerShown: true }}
                                 />
-
+                                <Stack.Screen // Add this new Stack.Screen for Profile
+                                    name="Profile"
+                                    component={Profile}
+                                    options={{ headerShown: true, title: 'Profile' }}
+                                />
                             </Stack.Navigator>
                             <MiniPlayer />
                         </View>
@@ -311,6 +328,7 @@ export default function App() {
         </Provider>
     );
 }
+
 
 
 

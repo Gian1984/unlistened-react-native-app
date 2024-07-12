@@ -34,6 +34,18 @@ export interface FeedInfo {
     newestItemPublishTime:number;
 }
 
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    preferred_language: string;
+}
+
+export interface Message {
+    object: string;
+    description: string;
+}
+
 export type IconName =
     | 'home'
     | 'home-outline'
@@ -48,9 +60,7 @@ export type IconName =
     | 'bookmark'
     | 'bookmark-outline'
     | 'setting'
-    | 'setting-outline'; // Add any other icons you are using
-
-
+    | 'setting-outline';
 
 export type RootStackParamList = {
     index: { categoryId?: number };
@@ -61,7 +71,7 @@ export type RootStackParamList = {
     Episodes: { id: number };
     Player: { episode_id: number };
     About: undefined;
-    Terms: undefined; // Ensure Terms is correctly defined
+    Terms: undefined;
     Settings: undefined;
     Back: undefined;
     Sign: undefined;
@@ -69,4 +79,6 @@ export type RootStackParamList = {
     Categories: undefined;
     ResetPassword: undefined;
     Register: undefined;
+    Profile: undefined;
 };
+

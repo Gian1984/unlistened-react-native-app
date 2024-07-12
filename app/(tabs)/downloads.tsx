@@ -6,9 +6,11 @@ import { useDownload } from '@/context/DownloadContext';
 import { useAudio } from '@/context/AudioContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Episode } from '@/types';
+import { TrashIcon } from 'react-native-heroicons/outline'; // Import the TrashIcon
+import { deleteDownloadedPodcast } from '@/services/api'; // Import the delete function
 
 const Downloads: React.FC = () => {
-    const { downloadedEpisodes, downloadEpisode } = useDownload();
+    const { downloadedEpisodes, downloadEpisode, removeDownloadedEpisode } = useDownload();
     const { setEpisode, togglePlayPause, isPlaying, setMiniPlayerVisible } = useAudio();
 
     const handlePlayEpisode = (episode: Episode) => {
@@ -21,6 +23,13 @@ const Downloads: React.FC = () => {
 
     const handleDownloadEpisode = async (episode: Episode) => {
         await downloadEpisode(episode);
+    };
+
+    const handleDeleteEpisode = async (episode: Episode) => {
+        if (episode.downloadedUri) {
+            await deleteDownloadedPodcast(episode.downloadedUri);
+            removeDownloadedEpisode(episode.id); // Update the state to reflect the deletion
+        }
     };
 
     return (
@@ -38,21 +47,31 @@ const Downloads: React.FC = () => {
                             <View>
                                 <Text style={styles.episodeTitle}>{episode.title}</Text>
                                 <Text style={styles.episodeDate}>{episode.datePublishedPretty}</Text>
-                                {episode.downloadedUri ? (
-                                    <TouchableOpacity
-                                        className="bg-indigo-700 py-3 mt-2 rounded-full flex"
-                                        onPress={() => handlePlayEpisode(episode)}
-                                    >
-                                        <Text className="text-white text-center font-bold">Play</Text>
-                                    </TouchableOpacity>
-                                ) : (
-                                    <TouchableOpacity
-                                        className="bg-gray-700 py-3 mt-2 rounded-full flex"
-                                        onPress={() => handleDownloadEpisode(episode)}
-                                    >
-                                        <Text className="text-white text-center font-bold">Download</Text>
-                                    </TouchableOpacity>
-                                )}
+                                <View style={styles.buttonContainer}>
+                                    {episode.downloadedUri ? (
+                                        <>
+                                            <TouchableOpacity
+                                                className="bg-indigo-700 py-3 mt-1 rounded-full flex"
+                                                onPress={() => handlePlayEpisode(episode)}
+                                            >
+                                                <Text className="w-60 text-white text-center font-bold">Play</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                className="bg-red-600 py-2.5 px-4 rounded-full flex items-center justify-center ml-2"
+                                                onPress={() => handleDeleteEpisode(episode)}
+                                            >
+                                                <TrashIcon className="h-5 w-5" color="white" />
+                                            </TouchableOpacity>
+                                        </>
+                                    ) : (
+                                        <TouchableOpacity
+                                            className="bg-gray-700 py-3 mt-2 rounded-full flex"
+                                            onPress={() => handleDownloadEpisode(episode)}
+                                        >
+                                            <Text className="text-white text-center font-bold">Download</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
                             </View>
                         </ThemedView>
                     ))
@@ -73,7 +92,6 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 20,
     },
-
     noEpisodesText: {
         fontSize: 16,
     },
@@ -85,6 +103,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 14,
         color: 'gray',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     playButton: {
         flexDirection: 'row',
@@ -101,6 +123,7 @@ const styles = StyleSheet.create({
 });
 
 export default Downloads;
+
 
 
 

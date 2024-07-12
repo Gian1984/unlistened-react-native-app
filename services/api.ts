@@ -1,8 +1,8 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import * as Localization from 'expo-localization';
-import { getInfoAsync, makeDirectoryAsync, downloadAsync, cacheDirectory } from 'expo-file-system';
-import { Podcast, Episode, FeedInfo } from '@/types';
+import { getInfoAsync, makeDirectoryAsync, downloadAsync, deleteAsync, cacheDirectory } from 'expo-file-system';
+import { Podcast, Episode, FeedInfo, User } from '@/types';
 
 const baseUrl = 'http://localhost';
 
@@ -68,9 +68,6 @@ export const register = async (username: string, email: string, password: string
 };
 
 
-
-
-
 export const logout = async (): Promise<void> => {
     try {
         await apiClient.post('/api/logout');
@@ -134,7 +131,6 @@ export const fetchEpisodes = async (feedId: number): Promise<Episode[]> => {
     }
 };
 
-
 export const addFavourite = async (feedId: number, feedTitle: string): Promise<{ id: number; title: string; feed_id: number }[]> => {
     try {
         await apiClient.post('api/add-favorite', { feed_id: feedId, title: feedTitle });
@@ -168,7 +164,6 @@ export const fetchFavorites = async (): Promise<{ id: number; title: string; fee
     }
 };
 
-// Function to fetch bookmarks
 export const fetchBookmarks = async (): Promise<{ id: number; title: string; episode_id: number }[]> => {
     try {
         const response = await apiClient.get('/api/user-bookmarks');
@@ -182,7 +177,6 @@ export const fetchBookmarks = async (): Promise<{ id: number; title: string; epi
         throw error;
     }
 };
-
 
 export const removeFavorite = async (id: number): Promise<void> => {
     try {
@@ -222,6 +216,15 @@ export const downloadPodcast = async (title: string, url: string, id: number): P
     }
 };
 
+export const deleteDownloadedPodcast = async (fileUri: string): Promise<void> => {
+    try {
+        await deleteAsync(fileUri, { idempotent: true });
+        console.log(`Deleted file: ${fileUri}`);
+    } catch (error: any) {
+        console.error('Error deleting episode:', error);
+        throw error;
+    }
+};
 
 export const sendDownloadData = async (id: number, title: string): Promise<void> => {
     try {
@@ -287,6 +290,61 @@ export const resetPassword = async (email: string): Promise<string> => {
         throw new Error(error.response?.data?.message || 'Failed to send reset password email');
     }
 };
+
+export const updateUser = async (username: string, email: string, preferred_language: string): Promise<void> => {
+    try {
+        await apiClient.post('/api/update_user', {
+            name: username,
+            email: email,
+            preferred_language: preferred_language,
+        });
+    } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data.message || 'Update failed');
+        } else {
+            throw new Error('Unexpected error during update');
+        }
+    }
+};
+
+export const sendMessage = async (object: string, description: string): Promise<void> => {
+    try {
+        await apiClient.post('/api/new-faq', {
+            message_obj: object,
+            message_desc: description,
+        });
+    } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data.message || 'Message sending failed');
+        } else {
+            throw new Error('Unexpected error during message sending');
+        }
+    }
+};
+
+export const deleteAccount = async (userId: number): Promise<void> => {
+    try {
+        await apiClient.get('/sanctum/csrf-cookie');
+        await apiClient.delete(`/api/delete_users/${userId}`);
+    } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data.message || 'Account deletion failed');
+        } else {
+            throw new Error('Unexpected error during account deletion');
+        }
+    }
+};
+
+export const fetchUserInfo = async (): Promise<User> => {
+    try {
+        const response = await apiClient.get<User>('/api/user');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user information:', error);
+        throw error;
+    }
+};
+
 
 
 export default apiClient;
