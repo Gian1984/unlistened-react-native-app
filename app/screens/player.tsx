@@ -5,6 +5,7 @@ import { RootStackParamList, Episode } from '@/types';
 import { ThemedView } from '@/components/ThemedView';
 import { fetchEpisode } from '@/services/api';
 import { useAudio } from '@/context/AudioContext';
+import Logo from '@/components/Logo';
 
 type PlayerScreenRouteProp = RouteProp<RootStackParamList, 'Player'>;
 
@@ -15,6 +16,7 @@ const PlayerScreen: React.FC = () => {
     const { setEpisode, episode: currentEpisode } = useAudio();
     const [loading, setLoading] = useState<boolean>(true);
     const [feedInfo, setFeedInfo] = useState<Episode | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadEpisode = async () => {
@@ -24,6 +26,7 @@ const PlayerScreen: React.FC = () => {
                 setFeedInfo(episodeData); // Set feed info based on episode data
             } catch (error) {
                 console.error('Error fetching episode:', error);
+                setError('Error fetching episode');
             } finally {
                 setLoading(false);
             }
@@ -48,6 +51,18 @@ const PlayerScreen: React.FC = () => {
                     <ActivityIndicator size="large" color="#ec4899" />
                     <Text className="my-4 text-base text-center text-gray-900">Loading...</Text>
                 </ThemedView>
+            </ThemedView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
+                    <Logo />
+                </ThemedView>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">It looks like you’re currently offline.</Text>
+                <Text className="my-4 text-base text-center text-gray-900">Don't worry, you can still enjoy your favorite podcasts! Head over to your Downloads section to access your saved episodes and continue listening to your selection. Happy listening!</Text>
             </ThemedView>
         );
     }
@@ -111,6 +126,7 @@ const styles = StyleSheet.create({
 });
 
 export default PlayerScreen;
+
 
 
 

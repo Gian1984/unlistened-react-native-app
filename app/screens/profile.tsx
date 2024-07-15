@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { ThemedView } from '@/components/ThemedView';
+import Logo from "@/components/Logo";
 import { fetchUserInfo, updateUser, sendMessage, deleteAccount } from '@/services/api';
 import { XMarkIcon } from 'react-native-heroicons/outline';
 import { User } from '@/types';
@@ -115,6 +116,7 @@ const ProfileScreen: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [notificationType, setNotificationType] = useState<'success' | 'error'>('success');
+    const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -127,6 +129,7 @@ const ProfileScreen: React.FC = () => {
             } catch (error) {
                 setMessage('Error fetching user information');
                 setNotificationType('error');
+                setError(true);
                 setTimeout(() => setMessage(null), 5000);
             }
         };
@@ -194,6 +197,18 @@ const ProfileScreen: React.FC = () => {
             ]
         );
     };
+
+    if (error) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
+                    <Logo />
+                </ThemedView>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">It looks like you’re currently offline.</Text>
+                <Text className="my-4 text-base text-center text-gray-900">Don't worry, you can still enjoy your favorite podcasts! Head over to your Downloads section to access your saved episodes and continue listening to your selection. Happy listening!</Text>
+            </ThemedView>
+        );
+    }
 
     return (
         <ThemedView className="flex-1 bg-white">

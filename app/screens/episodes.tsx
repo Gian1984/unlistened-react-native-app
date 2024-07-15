@@ -10,6 +10,8 @@ import { CheckCircleIcon, PlayIcon, BookmarkIcon, ArrowDownTrayIcon, StarIcon } 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDownload } from '@/context/DownloadContext';
 import { useAuth } from '@/context/AuthContext';
+import Logo from "@/components/Logo";
+
 
 type EpisodesScreenRouteProp = RouteProp<RootStackParamList, 'Episodes'>;
 type PlayerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Player'>;
@@ -94,6 +96,10 @@ const EpisodesScreen: React.FC = () => {
         }
     };
 
+    const handleGoDownload = () => {
+        navigation.navigate('Downloads')
+    };
+
     if (loading) {
         return (
             <SafeAreaView style={styles.safeArea}>
@@ -104,12 +110,12 @@ const EpisodesScreen: React.FC = () => {
 
     if (error) {
         return (
-            <ThemedView className="bg-white h-full">
-                <ThemedView className="flex-1 justify-center items-center mb-32">
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: 'red' }}>{error}</Text>
-                    </View>
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
+                    <Logo />
                 </ThemedView>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">It looks like you’re currently offline.</Text>
+                <Text className="my-4 text-base text-center text-gray-900">Don't worry, you can still enjoy your favorite podcasts! Head over to your Downloads section to access your saved episodes and continue listening to your selection. Happy listening!</Text>
             </ThemedView>
         );
     }

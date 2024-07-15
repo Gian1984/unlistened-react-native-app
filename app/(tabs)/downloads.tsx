@@ -8,10 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Episode } from '@/types';
 import { TrashIcon } from 'react-native-heroicons/outline'; // Import the TrashIcon
 import { deleteDownloadedPodcast } from '@/services/api'; // Import the delete function
+import { useNavigation } from '@react-navigation/native';
 
 const Downloads: React.FC = () => {
     const { downloadedEpisodes, downloadEpisode, removeDownloadedEpisode } = useDownload();
     const { setEpisode, togglePlayPause, isPlaying, setMiniPlayerVisible } = useAudio();
+    const navigation = useNavigation();
 
     const handlePlayEpisode = (episode: Episode) => {
         setEpisode(episode);

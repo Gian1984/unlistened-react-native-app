@@ -46,9 +46,15 @@ const Header: React.FC = () => {
         navigation.navigate('Categories');
     };
 
+    const handleBackHome = () => {
+        navigation.navigate('index', { categoryId: undefined })
+    };
+
     return (
         <View style={styles.container}>
-            <Image source={require('@/assets/images/unlistened_transparen_logo_176.png')} style={styles.logo} />
+            <TouchableOpacity onPress={handleBackHome}>
+                <Image source={require('@/assets/images/unlistened_transparen_logo_176.png')} style={styles.logo} />
+            </TouchableOpacity>
             <View style={styles.iconsContainer}>
                 <TouchableOpacity onPress={handleSearch} style={styles.iconContainer}>
                     <MagnifyingGlassIcon color="black" />

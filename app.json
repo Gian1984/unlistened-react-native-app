@@ -8,7 +8,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/undiscover_logo_500_white.png",
+      "image": "./assets/images/unlistened_500_white.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
