@@ -48,13 +48,25 @@ const CategoriesScreen: React.FC = () => {
 
     if (loading) {
         return (
-            <ThemedView style={styles.loadingContainer}>
-                <ThemedView style={styles.logoContainer}>
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
                     <Logo />
                 </ThemedView>
-                <Text style={styles.welcomeText}>Welcome!</Text>
-                <Text style={styles.loadingText}>We're getting the latest updates to bring you the freshest categories.</Text>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">Welcome!</Text>
+                <Text className="my-4 text-base text-center text-gray-900">We're getting the latest updates to bring you the freshest categories.</Text>
                 <ActivityIndicator size="large" color="#ec4899" />
+            </ThemedView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedView className="flex-1 items-center justify-center bg-white p-4 py-4">
+                <ThemedView className="py-6">
+                    <Logo />
+                </ThemedView>
+                <Text className="mt-4 text-3xl font-bold text-gray-900">It looks like you’re currently offline.</Text>
+                <Text className="my-4 text-base text-center text-gray-900">Don't worry, you can still enjoy your favorite podcasts! Head over to your Downloads section to access your saved episodes and continue listening to your selection. Happy listening!</Text>
             </ThemedView>
         );
     }
@@ -77,11 +89,6 @@ const CategoriesScreen: React.FC = () => {
                         />
                     </View>
                 </View>
-                {error && (
-                    <View style={styles.errorContainer}>
-                        <Text style={styles.errorText}>{error}</Text>
-                    </View>
-                )}
                 {filteredCategories.length === 0 ? (
                     <Text style={styles.noCategoriesText}>No categories available.</Text>
                 ) : (
@@ -111,35 +118,12 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         padding: 16,
     },
-    loadingContainer: {
+    errorContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
         padding: 4,
-    },
-    logoContainer: {
-        paddingBottom: 24,
-    },
-    welcomeText: {
-        marginTop: 16,
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    loadingText: {
-        marginTop: 16,
-        fontSize: 18,
-        textAlign: 'center',
-    },
-    errorContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 18,
     },
     header: {
         marginBottom: 20,
@@ -185,6 +169,7 @@ const styles = StyleSheet.create({
 });
 
 export default CategoriesScreen;
+
 
 
 
