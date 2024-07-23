@@ -4,7 +4,7 @@ import * as Localization from 'expo-localization';
 import { getInfoAsync, makeDirectoryAsync, downloadAsync, deleteAsync, cacheDirectory } from 'expo-file-system';
 import { Podcast, Episode, FeedInfo, User } from '@/types';
 
-const baseUrl = 'http://localhost';
+const baseUrl = 'https://www.unlistened.me/backend/public/';
 
 const apiClient = axios.create({
     baseURL: baseUrl,
